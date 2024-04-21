@@ -87,7 +87,7 @@ function offVideo(elementId, imgPath, videoMuteButtonImg, videoMuteButtonText) {
     // 自分の映像を停止している
     // ビデオ開始/停止ボタンの表示内容を変更する
     localVideoRatio = 0.75;
-    videoMuteButtonImg.src = 'video_off.png';
+    videoMuteButtonImg.src = 'Img/video_off.png';
     videoMuteButtonText.innerText = 'ビデオの開始';
   }else{
     // 相手の映像が停止されている
@@ -116,7 +116,7 @@ function onVideo(elementId, video, videoMuteButtonImg, videoMuteButtonText) {
     if(videoSettings.height && videoSettings.width) {
       localVideoRatio = videoSettings.height / videoSettings.width;
     }
-    videoMuteButtonImg.src = 'video_on.png';
+    videoMuteButtonImg.src = 'Img/video_on.png';
     videoMuteButtonText.innerText = 'ビデオの停止';
   }else{
     // 相手の映像が開始されている
@@ -268,11 +268,11 @@ const token = new SkyWayAuthToken({
   audioMuteButton.onclick = async () => {
     if (audioMuteButtonImg.src.endsWith('mic_on.png')) {
       await localAudioPublication.disable();
-      audioMuteButtonImg.src = 'mic_off.png';
+      audioMuteButtonImg.src = 'Img/mic_off.png';
       audioMuteButtonText.innerText = 'ミュート解除';
     } else {
       await localAudioPublication.enable();
-      audioMuteButtonImg.src = 'mic_on.png';
+      audioMuteButtonImg.src = 'Img/mic_on.png';
       audioMuteButtonText.innerText = 'ミュート';
     }
   }
@@ -282,7 +282,7 @@ const token = new SkyWayAuthToken({
   videoMuteButton.onclick = async () => {
     if (videoMuteButtonImg.src.endsWith('video_on.png')) {
       await localVideoPublication.disable();
-      offVideo('local-video', '0.png', videoMuteButtonImg, videoMuteButtonText);
+      offVideo('local-video', 'Img/0.png', videoMuteButtonImg, videoMuteButtonText);
     } else {
       await localVideoPublication.enable();
       onVideo('local-video', video, videoMuteButtonImg, videoMuteButtonText);
