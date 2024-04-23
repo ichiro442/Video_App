@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// 講師と生徒の情報を取得して名前を表示する
 
 ?>
 
@@ -18,7 +19,7 @@ session_start();
 <body class="bg-dark">
   <div id="header" class="bg-dark w-100 d-block d-sm-none" style="position: absolute; top: 0; z-index: 10;" hidden>
     <!-- 退室ボタン(スマホ用) -->
-    <div class="p-2 d-flex flex-column rounded-pill py-3 m-3" id="leave-button" style="width: 100px; position: absolute; right: 0; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="window.location.href='index.html'">
+    <div class="p-2 d-flex flex-column rounded-pill py-3 m-3" id="leave-button" style="width: 100px; position: absolute; right: 0; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="window.location.href='join.html'">
       <div class="row text-white justify-content-center">
         退出
       </div>
@@ -55,7 +56,7 @@ session_start();
       </small>
     </div>
     <!-- 退室ボタン -->
-    <div class="p-2 d-flex flex-column rounded-pill py-3 d-none d-sm-block" id="leave-button" style="width: 100px; position: absolute; right: 60px; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="window.location.href='index.html'">
+    <div class="p-2 d-flex flex-column rounded-pill py-3 d-none d-sm-block" id="leave-button" style="width: 100px; position: absolute; right: 60px; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="window.location.href='rating.php'">
       <div class="row text-white justify-content-center">
         退出
       </div>

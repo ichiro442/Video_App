@@ -181,6 +181,11 @@ body {
 /* ------------------- */
 header {
   justify-content: space-between !important;
+  position: fixed; /* ヘッダーを固定する */
+  top: 0;
+  width: 100%;
+  background-color: #c4e39f;
+  z-index: 1000; 
 }
 .header-left img {
   max-width: 100%;
