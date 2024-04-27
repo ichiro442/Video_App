@@ -23,6 +23,7 @@ try {
     session_regenerate_id(true); //session_idを新しく生成し、置き換える
     $_SESSION['userData'] = $userData;
     $_SESSION['userType'] = "teacher";
+    $_SESSION['flash_message'] = "ログインに成功しました";
 
     header('Location:' . $url . "Teacher");
     exit;
@@ -34,10 +35,6 @@ try {
 $title = "ログイン";
 require_once('header.php');
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -75,6 +72,8 @@ require_once('header.php');
 </style>
 
 <body>
+  <?php require_once('../modal_message.php'); ?>
+
   <form method="post">
     <h2>ログイン</h2>
     <label for="email">メールアドレス:</label>
@@ -83,13 +82,8 @@ require_once('header.php');
     <input type="password" id="password" name="password" required />
     <input type="submit" name="submit" value="ログイン" />
   </form>
-  <?php
-  if (!empty($_SESSION['flash_message'])) {
-    echo  "<p class='flashMessage' id='flash_message'>" . nl2br(h($_SESSION['flash_message'])) . "</p>";
-    unset($_SESSION['flash_message']);
-  }
-  ?>
 
 </body>
+<?php require_once('../footer.php'); ?>
 
 </html>

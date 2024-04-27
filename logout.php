@@ -11,21 +11,21 @@ if (ini_get("session.use_cookies")) {
 
 $dbConnect = new dbConnect();
 $url = $dbConnect->getURL();
-$_SESSION['userType'] == "student";
+
 // セッションの削除
 if ($_SESSION['userType'] == "admin") {
     $_SESSION = [];
     session_destroy();
-    header('Location:' . $url . "Admin");
+    header('Location:' . $url . "Admin/login");
     exit();
 } elseif ($_SESSION['userType'] == "teacher") {
     $_SESSION = [];
     session_destroy();
-    header('Location:' . $url . "Teacher");
+    header('Location:' . $url . "Teacher/login");
     exit();
 } elseif ($_SESSION['userType'] == "student") {
     $_SESSION = [];
     session_destroy();
-    header('Location:' . $url . "Student");
+    header('Location:' . $url . "Student/login");
     exit();
 }

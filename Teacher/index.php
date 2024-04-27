@@ -3,12 +3,16 @@ session_start();
 require_once('../db_class.php');
 
 try {
+    $dbConnect = new dbConnect();
     if (!empty($_SESSION["userData"])) {
         //データベースへ接続
-        $dbConnect = new dbConnect();
         $dbConnect->initPDO();
         $uri =  $_SERVER["REQUEST_URI"];
         $teacher = $dbConnect->findByMail($_SESSION["userData"]["email"], $uri);
+    } else {
+        $_SESSION['flash_message'] = "ログインまたは登録を完了してください。";
+        $url = $dbConnect->getURL();
+        header('Location:' . $url . "Teacher/login");
     }
 } catch (Exception $e) {
     echo $e->getMessage();
@@ -56,6 +60,7 @@ require_once('header.php');
 </style>
 
 <body>
+    <?php require_once('../modal_message.php'); ?>
     <div class="container">
         <h1>講師のマイページ</h1>
         <div class="profile-info">
@@ -66,6 +71,8 @@ require_once('header.php');
             <p><span>トータル収入: </span>$5000</p>
         </div>
     </div>
+
 </body>
+<?php require_once('../footer.php'); ?>
 
 </html>
