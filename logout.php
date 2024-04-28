@@ -11,6 +11,7 @@ if (ini_get("session.use_cookies")) {
 
 $dbConnect = new dbConnect();
 $url = $dbConnect->getURL();
+$_POST = [];
 
 // セッションの削除
 if ($_SESSION['userType'] == "admin") {
@@ -27,5 +28,10 @@ if ($_SESSION['userType'] == "admin") {
     $_SESSION = [];
     session_destroy();
     header('Location:' . $url . "Student/login");
+    exit();
+} else {
+    $_SESSION = [];
+    session_destroy();
+    header('Location:' . $url);
     exit();
 }

@@ -10,10 +10,16 @@ function h($s)
     return htmlspecialchars($s, ENT_QUOTES, "UTF-8");
 }
 try {
+
     $dbConnect = new dbConnect();
     $dbConnect->initPDO();
     $pdo = $dbConnect->getPDO();
 
+    // すでにログインしているユーザーはリダイレクト
+    if (isset($_SESSION['userType'])) {
+        header('Location:' . $url . "Student");
+        exit();
+    }
     // すべての講師を取得する
     $teachers = $dbConnect->findAllTeachers();
 } catch (PDOException $e) {
@@ -33,7 +39,7 @@ try {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200&display=swap" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
         //ヘッダーメニューの処理
         $(function() {
@@ -152,6 +158,8 @@ try {
 </header>
 
 <body>
+    <?php require_once('modal_message.php') ?>
+
     <div class="container">
         <div class="search-container">
             <h2>講師を検索する</h2>
@@ -177,5 +185,6 @@ try {
         </div>
     </div>
 </body>
+<?php require_once('footer.php'); ?>
 
 </html>

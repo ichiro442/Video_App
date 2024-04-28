@@ -78,6 +78,15 @@ class dbConnect
         $user = $stmt->fetch();
         return $user;
     }
+    // 【共通】メールアドレスですべてのユーザーを検索する
+    public function findAllUsersByMail($email)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM teachers WHERE email=:email UNION SELECT * FROM students WHERE email=:email");
+        $stmt->bindValue(":email", $email);
+        $stmt->execute();
+        $user = $stmt->fetch();
+        return $user;
+    }
 
     // 【共通】ユーザーを仮登録する
     public function insertUser($first_name, $last_name, $nickname, $email, $password, $table)
@@ -86,6 +95,8 @@ class dbConnect
         $stmt->bindvalue(":first_name", $first_name);
         $stmt->bindvalue(":last_name", $last_name);
         $stmt->bindvalue(":nickname", $nickname);
+        if ($this->findAllUsersByMail($email)) return false;
+
         $stmt->bindvalue(":email", $email);
         $phash = password_hash($password, PASSWORD_DEFAULT);
         $stmt->bindvalue(":password", $phash);
@@ -93,6 +104,19 @@ class dbConnect
         $stmt->bindvalue(":shash", $shash);
         $stmt->execute();
         return $shash;
+    }
+
+    // 【共通】パスワード更新
+    public function updatePass($userId, $userData, $uri)
+    {
+        $table = preg_match('/Teacher/', $uri) ? "teachers" : "students";
+        $query = "update `$table` set";
+        $query .= " password=:password";
+        $query .= " WHERE id=:id";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindvalue(":password", $userData["password"]);
+        $stmt->bindvalue(":id", $userId);
+        return $stmt->execute();
     }
 
     /**
@@ -119,6 +143,8 @@ class dbConnect
         $stmt->bindvalue(":last_name", $teacher["last_name"]);
         $stmt->bindvalue(":nickname", $teacher["nickname"]);
         $stmt->bindvalue(":picture", $teacher["picture"]);
+        if ($this->findAllUsersByMail($teacher["email"])) return false;
+
         $stmt->bindvalue(":email", $teacher["email"]);
         $stmt->bindvalue(":password", $teacher["password"]);
         $stmt->bindvalue(":status", $teacher["status"]);
@@ -160,6 +186,8 @@ class dbConnect
         $stmt->bindvalue(":last_name", $student["last_name"]);
         $stmt->bindvalue(":nickname", $student["nickname"]);
         $stmt->bindvalue(":picture", $student["picture"]);
+        if ($this->findAllUsersByMail($student["email"])) return false;
+
         $stmt->bindvalue(":email", $student["email"]);
         $stmt->bindvalue(":password", $student["password"]);
         $stmt->bindvalue(":status", $student["status"]);

@@ -4,11 +4,15 @@ require_once('../db_class.php');
 
 try {
     $dbConnect = new dbConnect();
-    if (!empty($_SESSION["userData"])) {
+    if (!empty($_SESSION["userData"]) && $_SESSION["userType"] == "teacher") {
         //データベースへ接続
         $dbConnect->initPDO();
         $uri =  $_SERVER["REQUEST_URI"];
         $teacher = $dbConnect->findByMail($_SESSION["userData"]["email"], $uri);
+    } else if (!empty($_SESSION["userData"]) && $_SESSION["userType"] == "student") {
+        $_SESSION['flash_message'] = "ログインまたは登録を完了してください。";
+        $url = $dbConnect->getURL();
+        header('Location:' . $url . "Student/login");
     } else {
         $_SESSION['flash_message'] = "ログインまたは登録を完了してください。";
         $url = $dbConnect->getURL();

@@ -62,6 +62,7 @@ require_once('header.php');
             <p><span>ID: </span><?php echo h($user["id"]) ?></p>
             <p><span>名前: </span><?php echo h($user["first_name"]) ?> <?php echo h($user["last_name"]) ?></p>
             <p><span>ニックネーム: </span><?php echo h($user["nickname"]) ?></p>
+            <p><span><a href="change_pass.php">パスワード変更</a></span></p>
         </div>
     </div>
 </body>

@@ -6,11 +6,20 @@ require_once('../db_class.php');
 
 try {
     $dbConnect = new dbConnect();
-    $dbConnect->initPDO();
-    $pdo = $dbConnect->getPDO();
 
-    // すべての講師を取得する
-    $teachers = $dbConnect->findAllTeachers();
+    if ((!is_null($_SESSION["userData"]) || !empty($_SESSION["userData"])) && $_SESSION["userType"] == "student") {
+        $dbConnect->initPDO();
+        // すべての講師を取得する
+        $teachers = $dbConnect->findAllTeachers();
+    } else if ($_SESSION["userType"] == "teacher") {
+        $_SESSION['flash_message'] = "講師は生徒画面にログインできません。";
+        $url = $dbConnect->getURL();
+        header('Location:' . $url . "Teacher");
+    } else {
+        $_SESSION['flash_message'] = "ログインまたは登録を完了してください。";
+        $url = $dbConnect->getURL();
+        header('Location:' . $url . "Student/login");
+    }
 } catch (PDOException $e) {
     echo $e->getMessage();
     exit;
@@ -65,6 +74,8 @@ require_once('header.php');
 </head>
 
 <body>
+    <?php require_once('../modal_message.php'); ?>
+
     <div class="container">
         <div class="search-container">
             <h2>講師を検索する</h2>
@@ -90,5 +101,6 @@ require_once('header.php');
         </div>
     </div>
 </body>
+<?php require_once('../footer.php'); ?>
 
 </html>

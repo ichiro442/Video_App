@@ -279,4 +279,97 @@ height: 100%;
   width: 100%;
   height: 100%;
 }
+/* ------------------- */
+/* header */
+/* ------------------- */
+header {
+  justify-content: space-between !important;
+  position: fixed; /* ヘッダーを固定する */
+  top: 0;
+  width: 100%;
+  background-color: #c4e39f;
+  z-index: 1000; 
+}
+.header-left img {
+  max-width: 100%;
+  height: auto;
+  width: 56%;
+  margin-left: 0.5rem;
+  vertical-align: bottom;
+}
+.header-right-top {
+  justify-content: end;
+  margin-right: 1rem;
+  padding-bottom: 0.7rem;
+}
+.header-right-top li {
+  margin-right: 1rem;
+}
+.header-right-top li a {
+  font-size: 1.2vw;
+}
+.header-right-bottom li {
+  margin-right: 1rem;
+}
+.header-right-bottom .btn {
+  padding: 5px 20px;
+  color: #333;
+  border-radius: 5px;
+  font-size: 1.2rem;
+}
+.header-right-bottom .btn.register-btn {
+  background-color: #51e151;
+}
+.header-right-bottom .btn.login-btn {
+  background-color: darkorange;
+}
+.header-right-bottom .btn.mypage-btn {
+  background-color: deepskyblue;
+  cursor: pointer;
+}
+.header-right-bottom .btn.search-btn {
+  background-color: #6ee1b6;
+}
+.menu-box {
+  display: none;
+}
+
+/* ------------------- */
+/* modal モーダル */
+/* ------------------- */
+  /* モーダルCSS */
+  .modalArea {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    /*サイトによってここの数値は調整 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.modalBg {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(30, 30, 30, 0.9);
+}
+
+.modalWrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    max-width: 500px;
+    padding: 10px 30px;
+    background-color: #fff;
+}
+
+.closeModal {
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    cursor: pointer;
+}
 
