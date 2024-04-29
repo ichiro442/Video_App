@@ -12,6 +12,12 @@ class dbConnect
     // 本番環境のURL
     private $prodURL = "http://moriyama-programming.tokyo/";
 
+    // ローカル環境の写真をアップロードする先のディレクトリ
+    private $localUploadDir = "/video_app/uploaded_pictures/";
+
+    // 本番環境の写真をアップロードする先のディレクトリ
+    private $prodUploadDir = "/var/www/video_app/uploaded_pictures/";
+
     /**
      * =======================
      * || 共通メソッド ||
@@ -46,6 +52,15 @@ class dbConnect
             return $this->localURL;
         } else {
             return $this->prodURL;
+        }
+    }
+    // 【共通】写真をアップロードするする先のディレクトリの取得
+    public function getdir()
+    {
+        if ($this->containsLocalhost($_SERVER['HTTP_HOST'])) {
+            return $this->localUploadDir;
+        } else {
+            return $this->prodUploadDir;
         }
     }
 
@@ -106,15 +121,15 @@ class dbConnect
         return $shash;
     }
 
-    // 【共通】パスワード更新
-    public function updatePass($userId, $userData, $uri)
+    // 【共通】一つのデータを更新
+    public function updateOneColumn($userId, $value, $column, $uri)
     {
         $table = preg_match('/Teacher/', $uri) ? "teachers" : "students";
         $query = "update `$table` set";
-        $query .= " password=:password";
+        $query .= " `$column`=:value";
         $query .= " WHERE id=:id";
         $stmt = $this->pdo->prepare($query);
-        $stmt->bindvalue(":password", $userData["password"]);
+        $stmt->bindvalue(":value", $value);
         $stmt->bindvalue(":id", $userId);
         return $stmt->execute();
     }

@@ -19,13 +19,16 @@ try {
         // パスワードの整合
         if ($passCheck) {
             $userData["password"] = $newPassHash;
-            $dbConnect->updatePass($userData["id"], $userData, $uri);
+            $column = "password";
+            $result = $dbConnect->updateOneColumn($userData["id"], $userData["password"], $column, $uri);
+
             // パスワードの一致を確認する
             if ($_POST['newPassword'] !== $_POST['newPasswordConfirm']) {
                 $_SESSION['flash_message'] =  "新しいパスワードと新しいパスワードの確認が一致しません。もう一度入力してください。";
                 unset($_POST);
             } else {
                 $_SESSION['flash_message'] = "パスワードを更新しました。";
+                $_SESSION['userData']["password"] = $_POST['newPassword'];
                 $url = $dbConnect->getURL();
                 header('Location:' . $url . "Student/my_page");
                 exit;
