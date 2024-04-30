@@ -21,7 +21,6 @@ function uploadFile($filedata)
             throw new Exception("フォルダを作成できません");
         }
     }
-
     // ファイルサイズチェック
     $fileSize = $filedata['size'];
 
@@ -63,20 +62,22 @@ try {
     if (!empty($_POST["submit"])) {
         $dbConnect = new dbConnect();
         $dbConnect->initPDO();
-        $userData = $_POST["picture"];
-
+        $user = $_POST;
         // 画像アップロード処理
         // 初期化。アップロードできなかった場合であってもそれ以外を保存するようにする
-        $userData["picture"] = "";
+        $user["picture"] = "";
 
         if (!empty($_FILES['picture'])) {
-            $userData["picture"] = uploadFile($_FILES['picture']);
-            if ($userData["picture"] === false) {
-                $userData["picture"] = "";
+            $user["picture"] = uploadFile($_FILES['picture']);
+            if ($user["picture"] === false) {
+                $user["picture"] = "";
                 throw new Exception("画像の保存処理で失敗しました。");
             }
         }
-        $dbConnect->updateStudent($userData["id"], $userData);
+        $column = "picture";
+        $uri =  $_SERVER["REQUEST_URI"];
+
+        $dbConnect->updateOneColumn($userData["id"], $user["picture"], $column, $uri);
         $_SESSION['userData'] = $userData;
         $_SESSION['flash_message'] = "画像を更新しました。";
         $url = $dbConnect->getURL();
@@ -128,10 +129,16 @@ require_once('header.php');
     input[type="submit"]:hover {
         background-color: #45a049;
     }
+
+    /* プレビュー画像の高さと幅を指定 */
+    #preview {
+        max-height: 200px;
+        max-width: 200px;
+    }
 </style>
 
 <?php require_once('../modal_message.php'); ?>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <h2>画像変更</h2>
     <div class="register-item flex">
         <div class="form-item-label flex">
@@ -153,4 +160,14 @@ require_once('header.php');
         </div>
 </form>
 </body>
+<script>
+    //選んだ画像をプレビューするメソッド
+    function previewImage(obj) {
+        var fileReader = new FileReader();
+        fileReader.onload = (function() {
+            document.getElementById('preview').src = fileReader.result;
+        });
+        fileReader.readAsDataURL(obj.files[0]);
+    }
+</script>
 <?php require_once('../footer.php'); ?>

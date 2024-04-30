@@ -13,7 +13,7 @@ class dbConnect
     private $prodURL = "http://moriyama-programming.tokyo/";
 
     // ローカル環境の写真をアップロードする先のディレクトリ
-    private $localUploadDir = "/video_app/uploaded_pictures/";
+    private $localUploadDir = "/Applications/MAMP/htdocs/video_app/uploaded_pictures/";
 
     // 本番環境の写真をアップロードする先のディレクトリ
     private $prodUploadDir = "/var/www/video_app/uploaded_pictures/";

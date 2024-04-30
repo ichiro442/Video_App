@@ -23,7 +23,7 @@ require_once('header.php');
     body {
         font-family: Arial, sans-serif;
         margin: 0;
-        padding: 60px;
+        padding-top: 60px;
         background-color: #f4f4f4;
     }
 
@@ -62,6 +62,16 @@ require_once('header.php');
 
     .row {
         justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+
+    }
+
+    /* 画像のスタイル */
+    .profile-picture img {
+        max-width: 200px;
+        max-height: 200px;
     }
 </style>
 
@@ -69,9 +79,16 @@ require_once('header.php');
     <?php require_once('../modal_message.php'); ?>
     <div class="profile-info">
         <div class="row flex">
-            <div class="column-left"><span>写真:</span></div>
-            <div class="column-center"><?php echo h($user["picture"]) ?></div>
-            <div class="column-right"><a href="change_picture.php">変更</a></div>
+            <div class="column-cente profile-picture">
+                <?php
+                if (($user["picture"]) !== "") {
+                    echo '<img src="../uploaded_pictures/' . h($user["picture"]) . '" alt="ユーザーの画像"> ';
+                } else {
+                    echo '<img src="../Img/person.jpg" alt="人の画像"> ';
+                }
+                ?>
+            </div>
+            <div class="column-right"><a href="change_picture.php">写真変更</a></div>
         </div>
         <div class="row flex">
             <div class="column-left"><span>ID:</span></div>
@@ -99,18 +116,6 @@ require_once('header.php');
             <div class="column-right"><a href="change_pass.php">パスワード変更</a></div>
         </div>
     </div>
-
-    <!-- <div class="container">
-        <h1>生徒のマイページ</h1>
-        <div class="profile-info">
-            <p><span>写真: </span><?php echo h($user["picture"]) ?></p>
-            <p><span>ID: </span><?php echo h($user["id"]) ?></p>
-            <p><span>名前: </span><?php echo h($user["first_name"]) ?> <?php echo h($user["last_name"]) ?></p>
-            <p><span>ニックネーム: </span><?php echo h($user["nickname"]) ?></p>
-            <p><span>メールアドレス: </span><?php echo h($user["email"]) ?></p>
-            <p><span><a href="change_pass.php">パスワード変更</a></span></p>
-        </div>
-    </div> -->
 </body>
 <?php require_once('../footer.php'); ?>
 
