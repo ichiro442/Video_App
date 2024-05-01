@@ -32,18 +32,20 @@ require_once('header.php');
     body {
         font-family: Arial, sans-serif;
         margin: 0;
-        padding: 0;
+        padding-top: 80px;
     }
 
     .container {
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100vh;
+        /* height: 100vh; */
+        max-width: 1400px;
     }
 
     .search-container {
         margin-right: 20px;
+        width: 20%;
     }
 
     .search-container h2 {
@@ -60,15 +62,31 @@ require_once('header.php');
     .teacher-list {
         border: 1px solid #ccc;
         padding: 20px;
-        max-width: 600px;
+        max-width: 1030px;
+        flex-wrap: wrap;
+        width: 100%;
     }
 
     .teacher-list h2 {
         margin-bottom: 10px;
     }
 
+    /* 講師リストのブロックごとのスタイル */
     .teacher-list div {
-        margin-bottom: 5px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        margin: 3px;
+        /* ブロックの下部に余白を追加 */
+    }
+
+    .teacher-block {
+        border: solid 1px black;
+    }
+
+    /* 画像のスタイル */
+    .teacher-block img {
+        max-width: 100px;
+        max-height: 100px;
     }
 </style>
 </head>
@@ -92,12 +110,20 @@ require_once('header.php');
         </div>
         <div class="teacher-list">
             <h2>講師一覧</h2>
-            <?php
-            // 講師一覧を表示
-            foreach ($teachers as $teacher) {
-                echo '<div><a href="teacher_detail.php?id=' . $teacher['id'] . '" target="blank">' . $teacher['nickname']  . '</a></div>';
-            }
-            ?>
+            <div class="flex" style="justify-content: unset;">
+                <?php
+                // 講師一覧を表示
+                foreach ($teachers as $teacher) {
+                    echo '<div class="teacher-block">';
+                    // 講師の写真を表示
+                    echo '<a href="teacher_detail.php?id=' . $teacher['id'] . '" target="_blank">';
+                    echo '<img src="../uploaded_pictures/' . h($teacher["picture"]) . '" alt="講師の画像">';
+                    // 講師のニックネームを表示
+                    echo '<div>' . $teacher['nickname'] . '</div></a>';
+                    echo '</div>';
+                }
+                ?>
+            </div>
         </div>
     </div>
 </body>
