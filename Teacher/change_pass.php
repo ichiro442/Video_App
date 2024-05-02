@@ -31,7 +31,7 @@ try {
                 $_SESSION['flash_message'] = "パスワードを更新しました。";
                 $_SESSION['userData']["password"] = $_POST['newPassword'];
                 $url = $dbConnect->getURL();
-                header('Location:' . $url . "Student/my_page");
+                header('Location:' . $url . "Teacher");
                 exit;
             }
         } else {

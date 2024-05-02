@@ -22,7 +22,7 @@ try {
             $_SESSION['flash_message'] = "メールアドレスを更新しました。";
             $_SESSION['userData']["nickname"] = $_POST["email"];
             $url = $dbConnect->getURL();
-            header('Location:' . $url . "Student/my_page");
+            header('Location:' . $url . "Teacher/my_page");
             exit;
         }
     }

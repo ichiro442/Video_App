@@ -9,20 +9,19 @@ try {
         $dbConnect = new dbConnect();
         $dbConnect->initPDO();
 
-        $userData["email"] = $_POST["email"];
-        $column = "email";
+        $userData["nickname"] = $_POST["nickname"];
+        $column = "nickname";
         $uri =  $_SERVER["REQUEST_URI"];
-        $result = $dbConnect->updateOneColumn($userData["id"], $userData["email"], $column, $uri);
-
-        // 結果を確認する
+        $result = $dbConnect->updateOneColumn($userData["id"], $userData["nickname"], $column, $uri);
+        // 更新結果を確認する
         if (!$result) {
-            $_SESSION['flash_message'] =  "メールアドレスが更新できませんでした。もう一度入力してください。";
+            $_SESSION['flash_message'] =  "ニックネームが更新できませんでした。もう一度入力してください。";
             unset($_POST);
         } else {
-            $_SESSION['flash_message'] = "メールアドレスを更新しました。";
-            $_SESSION['userData']["nickname"] = $_POST["email"];
+            $_SESSION['flash_message'] = "ニックネームを更新しました。";
+            $_SESSION['userData']["nickname"] = $_POST["nickname"];
             $url = $dbConnect->getURL();
-            header('Location:' . $url . "Student/my_page");
+            header('Location:' . $url . "Teacher");
             exit;
         }
     }
@@ -32,7 +31,7 @@ try {
     exit;
 }
 
-$title = "メールアドレス変更";
+$title = "ニックネーム変更";
 require_once('header.php');
 ?>
 <link rel="stylesheet" href="change.css">
@@ -40,7 +39,7 @@ require_once('header.php');
 <?php require_once('../modal_message.php'); ?>
 <form method="post">
     <h2><?php echo h($title) ?></h2>
-    <input type="email" name="email" value="<?php echo h($userData["email"]) ?>" required />
+    <input type="text" name="nickname" value="<?php echo h($userData["nickname"]) ?>" required />
     <div class="flex">
         <input type="button" name="back" onclick="history.back(-1);" value="戻る" />
         <input type="submit" name="submit" value="変更" />

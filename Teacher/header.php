@@ -39,7 +39,7 @@ function h($s)
 <body>
     <header class="flex">
         <div class="header-left">
-            <a class="" href="/"><img src="/Img/logo-3.jpg" alt="ロゴ"></a>
+            <a class="" href="/video_app/Teacher"><img src="../Img/logo.png" alt="ロゴ"></a>
         </div>
         <div class="header-right">
             <ul class="header-right-bottom flex">

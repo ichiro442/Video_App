@@ -44,7 +44,8 @@ body {
     font-weight: bold;
   }
   input[type="text"],
-  input[type="email"] {
+  input[type="email"],
+  input[type="password"]{
     width: calc(100% - 20px);
     padding: 10px;
     border: 1px solid #ccc;

@@ -1,0 +1,56 @@
+body {
+    font-family: Arial, sans-serif;
+    padding-top: 80px;
+}
+
+form {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+input[type="submit"],
+input[type="button"] {
+    /* 既存のスタイル */
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 6px;
+    width: 30%;
+    /* 追加したスタイル */
+    flex-grow: 1;
+    /* 横方向に均等なスペースを占める */
+}
+
+/* プレビュー画像の高さと幅を指定 */
+#preview {
+    max-height: 200px;
+    max-width: 200px;
+}

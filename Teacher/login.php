@@ -33,7 +33,7 @@ try {
   exit;
 }
 $title = "ログイン";
-require_once('header.php');
+require_once('header_function.php');
 ?>
 <style>
   body {

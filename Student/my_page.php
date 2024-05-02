@@ -1,11 +1,11 @@
 <?php
 session_start();
 require_once('../db_class.php');
+require_once('validation.php');
 
 try {
     if (!empty($_SESSION["userData"])) {
         //データベースへ接続
-        $dbConnect = new dbConnect();
         $dbConnect->initPDO();
         $uri =  $_SERVER["REQUEST_URI"];
         $user = $dbConnect->findByMail($_SESSION["userData"]["email"], $uri);
@@ -87,7 +87,7 @@ require_once('header.php');
                 <div class="column-cente profile-picture">
                     <img src="../uploaded_pictures/<?php echo h($user["picture"]) ?>" alt="ユーザーの画像">
                 </div>
-                <div class="column-right"><a href="change_picture.php">写真変更</a></div>
+                <div class="column-right" style="text-align: center;"><a href="change_picture.php">写真変更</a></div>
             </div>
         </div>
         <div class="profile-right">

@@ -23,7 +23,7 @@ try {
     exit;
 }
 
-$title = "マイページ";
+$title = "講師マイページ";
 require_once('header.php');
 
 ?>
@@ -31,7 +31,7 @@ require_once('header.php');
     body {
         font-family: Arial, sans-serif;
         margin: 0;
-        padding: 0;
+        padding-top: 80px;
         background-color: #f4f4f4;
     }
 
@@ -52,6 +52,12 @@ require_once('header.php');
 
     .profile-info {
         margin-bottom: 20px;
+        width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
     }
 
     .profile-info p {
@@ -61,18 +67,72 @@ require_once('header.php');
     .profile-info p span {
         font-weight: bold;
     }
+
+    .row {
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+
+    }
+
+    .profile-right {
+        width: 100%;
+    }
+
+    /* 画像のスタイル */
+    .profile-picture img {
+        max-width: 200px;
+        max-height: 200px;
+    }
 </style>
 
 <body>
     <?php require_once('../modal_message.php'); ?>
-    <div class="container">
-        <h1>講師のマイページ</h1>
-        <div class="profile-info">
-            <p><span>ID: </span><?php echo h($teacher["id"]) ?></p>
-            <p><span>名前: </span><?php echo h($teacher["first_name"]) ?> <?php echo h($teacher["last_name"]) ?></p>
-            <p><span>ニックネーム: </span><?php echo h($teacher["nickname"]) ?></p>
-            <p><span>レッスン数: </span>100</p>
-            <p><span>トータル収入: </span>$5000</p>
+    <h1><?php echo h($title) ?></h1>
+    <div class="profile-info flex">
+        <div class="">
+            <div class="row" style="border: none;">
+                <div class="column-cente profile-picture">
+                    <img src="../uploaded_pictures/<?php echo h($teacher["picture"]) ?>" alt="ユーザーの画像">
+                </div>
+                <div class="column-right" style="text-align: center;"><a href="change_picture.php">写真変更</a></div>
+            </div>
+        </div>
+        <div class="profile-right">
+            <div class="row flex">
+                <div class="column-left"><span>ID:</span></div>
+                <div class="column-center"><?php echo h($teacher["id"]) ?></div>
+                <div class="column-right"></div>
+            </div>
+            <div class="row flex">
+                <div class="column-left"><span>名前:</span></div>
+                <div class="column-center"><?php echo h($teacher["first_name"]) ?> <?php echo h($teacher["last_name"]) ?></div>
+                <div class="column-right"><a href="change_name.php"></a></div>
+            </div>
+            <div class="row flex">
+                <div class="column-left"><span>ニックネーム:</span></div>
+                <div class="column-center"><?php echo h($teacher["nickname"]) ?></div>
+                <div class="column-right"><a href="change_nickname.php">変更</a></div>
+            </div>
+            <div class="row flex">
+                <div class="column-left"><span>メールアドレス:</span></div>
+                <div class="column-center"><?php echo h($teacher["email"]) ?></div>
+                <div class="column-right"><a href="change_email.php">変更</a></div>
+            </div>
+            <div class="row flex">
+                <div class="column-left"></div>
+                <div class="column-center"></div>
+                <div class="column-right"><a href="change_pass.php">パスワード変更</a></div>
+            </div>
+            <div class="row flex">
+                <div class="column-left"><span>レッスン数:</span></div>
+                <div class="column-center">100</div>
+            </div>
+            <div class="row flex">
+                <div class="column-left"><span>トータル収入:</span></div>
+                <div class="column-center">$5000</div>
+            </div>
         </div>
     </div>
 

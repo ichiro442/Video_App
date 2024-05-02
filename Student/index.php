@@ -1,25 +1,9 @@
 <?php
 session_start();
 require_once('../db_class.php');
-// データベースから講師データを取得する
-// htmlで表示する
 
 try {
-    $dbConnect = new dbConnect();
-
-    if ((!is_null($_SESSION["userData"]) || !empty($_SESSION["userData"])) && $_SESSION["userType"] == "student") {
-        $dbConnect->initPDO();
-        // すべての講師を取得する
-        $teachers = $dbConnect->findAllTeachers();
-    } else if ($_SESSION["userType"] == "teacher") {
-        $_SESSION['flash_message'] = "講師は生徒画面にログインできません。";
-        $url = $dbConnect->getURL();
-        header('Location:' . $url . "Teacher");
-    } else {
-        $_SESSION['flash_message'] = "ログインまたは登録を完了してください。";
-        $url = $dbConnect->getURL();
-        header('Location:' . $url . "Student/login");
-    }
+    require_once('validation.php');
 } catch (PDOException $e) {
     echo $e->getMessage();
     exit;
@@ -37,7 +21,7 @@ require_once('header.php');
 
     .container {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         /* height: 100vh; */
         max-width: 1400px;
@@ -45,7 +29,9 @@ require_once('header.php');
 
     .search-container {
         margin-right: 20px;
+        border: 1px solid #ccc;
         width: 20%;
+        align-items: normal;
     }
 
     .search-container h2 {
@@ -57,6 +43,7 @@ require_once('header.php');
     .search-container button {
         margin-bottom: 10px;
         display: block;
+        width: 80%;
     }
 
     .teacher-list {
@@ -97,32 +84,30 @@ require_once('header.php');
     <div class="container">
         <div class="search-container">
             <h2>講師を検索する</h2>
-            <input type="text" id="searchName" placeholder="名前で検索">
-            <select id="searchCountry">
-                <option value="">国名で検索</option>
-                <option value="USA">USA</option>
-                <option value="UK">UK</option>
-                <option value="Japan">Japan</option>
-                <option value="Spain">Spain</option>
-                <option value="Pakistan">Pakistan</option>
-            </select>
-            <button onclick="searchTeachers()">検索</button>
+            <div class="flex-vertical">
+                <input type="text" id="searchName" placeholder="名前で検索">
+                <select id="searchCountry">
+                    <option value="">国名で検索</option>
+                    <option value="USA">USA</option>
+                    <option value="UK">UK</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Spain">Spain</option>
+                    <option value="Pakistan">Pakistan</option>
+                </select>
+                <button onclick="searchTeachers()">検索</button>
+            </div>
         </div>
         <div class="teacher-list">
             <h2>講師一覧</h2>
             <div class="flex" style="justify-content: unset;">
-                <?php
-                // 講師一覧を表示
-                foreach ($teachers as $teacher) {
-                    echo '<div class="teacher-block">';
-                    // 講師の写真を表示
-                    echo '<a href="teacher_detail.php?id=' . $teacher['id'] . '" target="_blank">';
-                    echo '<img src="../uploaded_pictures/' . h($teacher["picture"]) . '" alt="講師の画像">';
-                    // 講師のニックネームを表示
-                    echo '<div>' . $teacher['nickname'] . '</div></a>';
-                    echo '</div>';
-                }
-                ?>
+                <?php foreach ($teachers as $teacher) { ?>
+                    <div class="teacher-block">
+                        <a href="teacher_detail.php?id=<?php echo h($teacher['id']) ?>" target="_blank">
+                            <img src="../uploaded_pictures/<?php echo h($teacher["picture"]) ?>" alt="講師の画像">
+                            <div><?php echo h($teacher['nickname']) ?></div>
+                        </a>
+                    </div>
+                <?php } ?>
             </div>
         </div>
     </div>

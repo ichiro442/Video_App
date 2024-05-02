@@ -90,8 +90,8 @@ header {
 }
 .header-left img {
   max-width: 100%;
-  height: auto;
-  width: 56%;
+  height: 60px;
+  width: 80%;
   margin-left: 0.5rem;
   vertical-align: bottom;
 }

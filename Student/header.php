@@ -39,7 +39,7 @@ function h($s)
 <body>
     <header class="flex">
         <div class="header-left">
-            <a class="" href="/video_app"><img src="../Img/logo.png" alt="ロゴ"></a>
+            <a class="" href="/video_app/Student"><img src="../Img/logo.png" alt="ロゴ"></a>
         </div>
         <div class="header-right">
             <ul class="header-right-bottom flex">
@@ -52,7 +52,7 @@ function h($s)
                     echo '<li><a id="login" class="btn login-btn" href="' . $url . 'logout">ログアウト</a></li>';
                 } else {
                     echo '<li><a class="btn register-btn" href="' . $url . 'signup?u=student">生徒登録</a></li>';
-                    echo '<li><a class="btn register-btn" href="' . $url . '/signup?u=teacher">講師登録</a></li>';
+                    // echo '<li><a class="btn register-btn" href="' . $url . 'signup?u=teacher">講師登録</a></li>';
                     echo '<li><a id="login" class="btn login-btn" href="' . $url . 'Student/login.php">ログイン</a></li>';
                 }
 
