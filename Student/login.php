@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once('../db_class.php');
+require_once('../definition.php');
 
 try {
     if (!empty($_POST["submit"])) {
@@ -15,14 +16,14 @@ try {
             $userData = $dbConnect->login($_POST["email"], $_POST["password"], $uri);
         }
         if (empty($userData)) {
-            $_SESSION['flash_message'] = "メールアドレスまたはパスワードが違います。";
+            $_SESSION['flash_message'] = FLASH_MESSAGE[9];
             header('Location:' . $url . "Student/login");
             exit;
         }
         session_regenerate_id(true); //session_idを新しく生成し、置き換える
         $_SESSION['userData'] = $userData;
         $_SESSION['userType'] = "student";
-        $_SESSION['flash_message'] = "ログインに成功しました";
+        $_SESSION['flash_message'] = FLASH_MESSAGE[10];
 
         header('Location:' . $url . "Student");
         exit;
@@ -35,40 +36,10 @@ try {
 $title = "ログイン";
 require_once('header_function.php');
 ?>
-
+<link rel="stylesheet" href="change.css">
 <style>
-    body {
-        font-family: Arial, sans-serif;
-    }
-
-    form {
-        width: 300px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-
-    input[type="text"],
-    input[type="password"],
     input[type="submit"] {
         width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        margin-bottom: 10px;
-        box-sizing: border-box;
-    }
-
-    input[type="submit"] {
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-
-    input[type="submit"]:hover {
-        background-color: #45a049;
     }
 </style>
 </head>

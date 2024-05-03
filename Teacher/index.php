@@ -1,27 +1,7 @@
 <?php
 session_start();
 require_once('../db_class.php');
-
-try {
-    $dbConnect = new dbConnect();
-    if (!empty($_SESSION["userData"]) && $_SESSION["userType"] == "teacher") {
-        //データベースへ接続
-        $dbConnect->initPDO();
-        $uri =  $_SERVER["REQUEST_URI"];
-        $teacher = $dbConnect->findByMail($_SESSION["userData"]["email"], $uri);
-    } else if (!empty($_SESSION["userData"]) && $_SESSION["userType"] == "student") {
-        $_SESSION['flash_message'] = "ログインまたは登録を完了してください。";
-        $url = $dbConnect->getURL();
-        header('Location:' . $url . "Student/login");
-    } else {
-        $_SESSION['flash_message'] = "ログインまたは登録を完了してください。";
-        $url = $dbConnect->getURL();
-        header('Location:' . $url . "Teacher/login");
-    }
-} catch (Exception $e) {
-    echo $e->getMessage();
-    exit;
-}
+require_once('validation.php');
 
 $title = "講師マイページ";
 require_once('header.php');
@@ -96,7 +76,7 @@ require_once('header.php');
                 <div class="column-cente profile-picture">
                     <img src="../uploaded_pictures/<?php echo h($teacher["picture"]) ?>" alt="ユーザーの画像">
                 </div>
-                <div class="column-right" style="text-align: center;"><a href="change_picture.php">写真変更</a></div>
+                <div class="column-right" style="text-align: center;"><a href="change_picture">写真変更</a></div>
             </div>
         </div>
         <div class="profile-right">
@@ -108,22 +88,22 @@ require_once('header.php');
             <div class="row flex">
                 <div class="column-left"><span>名前:</span></div>
                 <div class="column-center"><?php echo h($teacher["first_name"]) ?> <?php echo h($teacher["last_name"]) ?></div>
-                <div class="column-right"><a href="change_name.php"></a></div>
+                <div class="column-right"><a href="change_name"></a></div>
             </div>
             <div class="row flex">
                 <div class="column-left"><span>ニックネーム:</span></div>
                 <div class="column-center"><?php echo h($teacher["nickname"]) ?></div>
-                <div class="column-right"><a href="change_nickname.php">変更</a></div>
+                <div class="column-right"><a href="change_nickname">変更</a></div>
             </div>
             <div class="row flex">
                 <div class="column-left"><span>メールアドレス:</span></div>
                 <div class="column-center"><?php echo h($teacher["email"]) ?></div>
-                <div class="column-right"><a href="change_email.php">変更</a></div>
+                <div class="column-right"><a href="change_email">変更</a></div>
             </div>
             <div class="row flex">
                 <div class="column-left"></div>
                 <div class="column-center"></div>
-                <div class="column-right"><a href="change_pass.php">パスワード変更</a></div>
+                <div class="column-right"><a href="change_pass">パスワード変更</a></div>
             </div>
             <div class="row flex">
                 <div class="column-left"><span>レッスン数:</span></div>

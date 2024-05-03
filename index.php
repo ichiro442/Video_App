@@ -1,11 +1,58 @@
 <?php
 session_start();
 require_once('db_class.php');
+require_once('definition.php');
 
 try {
     $dbConnect = new dbConnect();
     $dbConnect->initPDO();
-    $teachers = $dbConnect->findAllTeachers();
+    $pdo = $dbConnect->getPDO();
+
+    // 検索ボタンが押された時の処理
+    if (!empty($_GET["submit"])) {
+        $query = $_GET["query"];
+        $sql = "SELECT * FROM teachers WHERE";
+        $andcount = 0;
+
+        // ANDをつけてSQLを作成する
+        foreach ($query as $key => $value) { // nicknameとcountry
+            if (!empty($value)) {
+                if ($andcount > 0) {
+                    $sql .= " AND";
+                }
+                $sql .= " (";
+                if ($key == "nickname") {
+                    $sql .= " $key LIKE :$key";
+                } else {
+                    $sql .= " $key = :$key";
+                }
+                $sql .= ")";
+                $andcount++;
+            }
+        }
+        // 上で作成したSQLに値をバインドする
+        if ($andcount > 0) {
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($query as $key => $value) {
+                if (!empty($value)) {
+                    if ($key == "nickname") {
+                        $stmt->bindValue(":$key", "%" . $value . "%", PDO::PARAM_STR);
+                    } else {
+                        $stmt->bindParam(":$key", $value);
+                    }
+                }
+            }
+        } else {
+            $sql = "SELECT * FROM teachers";
+            $stmt = $pdo->prepare($sql);
+        }
+    } else {
+        $_GET = [];
+        $sql = "SELECT * FROM teachers";
+        $stmt = $pdo->prepare($sql);
+    }
+    $stmt->execute();
 } catch (PDOException $e) {
     echo $e->getMessage();
     exit;
@@ -16,8 +63,6 @@ require_once('header.php');
 ?>
 <style>
     body {
-        font-family: Arial, sans-serif;
-        margin: 0;
         padding-top: 80px;
     }
 
@@ -25,60 +70,31 @@ require_once('header.php');
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        /* height: 100vh; */
         max-width: 1400px;
     }
 
-    .search-container {
-        margin-right: 20px;
-        border: 1px solid #ccc;
-        width: 20%;
-        align-items: normal;
-    }
-
-    .search-container h2 {
-        margin-bottom: 10px;
-    }
-
-    .search-container input,
-    .search-container select,
-    .search-container button {
-        margin-bottom: 10px;
-        display: block;
-        width: 80%;
-    }
-
-    .teacher-list {
-        border: 1px solid #ccc;
-        padding: 20px;
-        max-width: 1030px;
-        flex-wrap: wrap;
-        width: 100%;
-    }
-
-    .teacher-list h2 {
-        margin-bottom: 10px;
-    }
-
-    /* 講師リストのブロックごとのスタイル */
-    .teacher-list div {
-        margin-bottom: 10px;
-        flex-wrap: wrap;
-        margin: 3px;
-        /* ブロックの下部に余白を追加 */
-    }
-
-    .teacher-block {
-        border: solid 1px black;
-    }
-
-    /* 画像のスタイル */
-    .teacher-block img {
-        max-width: 100px;
-        max-height: 100px;
+    .search-container input[type="text"] {
+        padding: 10px 0;
     }
 </style>
 </head>
+<header class="flex">
+    <div class="header-left">
+        <a class="" href="/video_app"><img src="Img/logo.png" alt="ロゴ"></a>
+    </div>
+    <div class="header-right">
+        <ul class="header-right-bottom flex">
+            <?php
+            require_once('db_class.php');
+            $dbConnect = new dbConnect();
+            $url = $dbConnect->getURL();
+            echo '<li><a class="btn register-btn" href="' . $url . '/signup?u=student">生徒登録</a></li>';
+            echo '<li><a class="btn register-btn" href="' . $url . '/signup?u=teacher">講師登録</a></li>';
+            echo '<li><a id="login" class="btn login-btn" href="' . $url . 'Student/login">生徒ログイン</a></li>';
+            ?>
+        </ul>
+    </div>
+</header>
 
 <body>
     <?php require_once('modal_message.php'); ?>
@@ -87,29 +103,40 @@ require_once('header.php');
         <div class="search-container">
             <h2>講師を検索する</h2>
             <div class="flex-vertical">
-                <input type="text" id="searchName" placeholder="名前で検索">
-                <select id="searchCountry">
-                    <option value="">国名で検索</option>
-                    <option value="USA">USA</option>
-                    <option value="UK">UK</option>
-                    <option value="Japan">Japan</option>
-                    <option value="Spain">Spain</option>
-                    <option value="Pakistan">Pakistan</option>
-                </select>
-                <button onclick="searchTeachers()">検索</button>
+                <form action="" method="GET">
+                    <div class="">
+                        <label for="">講師名</label>
+                    </div>
+                    <div class="">
+                        <input type="text" name="query[nickname]" id="searchName">
+                    </div>
+                    <div class="">
+                        <label for="">国籍</label>
+                    </div>
+                    <div class="">
+                        <select id="searchCountry" name="query[country]">
+                            <option value=""></option>
+                            <?php foreach (COUNTRY as $country) : ?>
+                                <option value="<?php echo h($country) ?>"><?php echo h($country) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <input type="submit" name="submit" value="検索" />
+                </form>
             </div>
         </div>
         <div class="teacher-list">
             <h2>講師一覧</h2>
             <div class="flex" style="justify-content: unset;">
-                <?php foreach ($teachers as $teacher) { ?>
+                <?php foreach ($stmt as $teacher) : ?>
                     <div class="teacher-block">
-                        <a href="teacher_detail.php?id=<?php echo h($teacher['id']) ?>" target="_blank">
+                        <a href="Student/teacher_detail?id=<?php echo h($teacher['id']) ?>&u=un" target="_blank">
                             <img src="uploaded_pictures/<?php echo h($teacher["picture"]) ?>" alt="講師の画像">
                             <div><?php echo h($teacher['nickname']) ?></div>
+                            <div><?php echo h($teacher['country']) ?></div>
                         </a>
                     </div>
-                <?php } ?>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>

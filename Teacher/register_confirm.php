@@ -1,8 +1,8 @@
 <?php
 session_start();
 require_once('../db_class.php');
-require_once('header.php');
 require_once('../mail_class.php');
+require_once('../definition.php');
 
 
 // 仮登録データを取得する
@@ -43,13 +43,14 @@ try {
                 "*********************************************";
             $mailer = new mail();
             $mailer->setTo($email, $name);
-            $mailer->setSubject('【サービス名】　登録完了のお知らせ');
+            $mailer->setSubject(MAIL[1]);
             $mailer->setBody($message);
             $mailer->send();
             $url = $dbConnect->getURL();
             $_SESSION["userType"] = "teacher";
             $_SESSION["userType"] = $teacher;
-            header("Location: " . $url . "Teacher/index.php");
+            $_SESSION["flash_message"] = FLASH_MESSAGE[18];
+            header("Location: " . $url . "Teacher");
             exit;
         }
     }
@@ -57,6 +58,8 @@ try {
     echo $e->getMessage();
     exit;
 }
+require_once('header_function.php');
+$title = "講師新規登録";
 ?>
 
 <!DOCTYPE html>
@@ -66,7 +69,7 @@ try {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <title>講師新規登録</title>
+    <title><?php echo h($title) ?></title>
 </head>
 
 <body>

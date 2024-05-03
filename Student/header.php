@@ -4,6 +4,11 @@ function h($s)
     return htmlspecialchars($s, ENT_QUOTES, "UTF-8");
 }
 
+if ($_GET["u"] !== "un") {
+    $path = "/video_app/Student";
+} else {
+    $path = "/video_app";
+}
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +44,7 @@ function h($s)
 <body>
     <header class="flex">
         <div class="header-left">
-            <a class="" href="/video_app/Student"><img src="../Img/logo.png" alt="ロゴ"></a>
+            <a class="" href="<?php echo h($path) ?>"><img src="../Img/logo.png" alt="ロゴ"></a>
         </div>
         <div class="header-right">
             <ul class="header-right-bottom flex">
@@ -53,11 +58,11 @@ function h($s)
                 } else {
                     echo '<li><a class="btn register-btn" href="' . $url . 'signup?u=student">生徒登録</a></li>';
                     // echo '<li><a class="btn register-btn" href="' . $url . 'signup?u=teacher">講師登録</a></li>';
-                    echo '<li><a id="login" class="btn login-btn" href="' . $url . 'Student/login.php">ログイン</a></li>';
+                    echo '<li><a id="login" class="btn login-btn" href="' . $url . 'Student/login">ログイン</a></li>';
                 }
 
                 if (!empty($_SESSION['userData'])) {
-                    echo '<li><a class="btn mypage-btn" href="' . $url . 'Student/my_page.php">' . h($_SESSION['userData']['first_name']) . '</a></li>';
+                    echo '<li><a class="btn mypage-btn" href="' . $url . 'Student/my_page">' . h($_SESSION['userData']['first_name']) . '</a></li>';
                 } else {
                     echo '';
                 }
@@ -80,11 +85,11 @@ function h($s)
                     if (!empty($_SESSION['userData'])) {
                         echo '<li><a id="login" class="btn login-btn" href="' . $url . 'logout">ログアウト</a></li>';
                     } else {
-                        echo '<li><a id="login" class="btn login-btn" href="' . $url . 'Student/login.php">ログイン</a></li>';
+                        echo '<li><a id="login" class="btn login-btn" href="' . $url . 'Student/login">ログイン</a></li>';
                     }
 
                     if (!empty($_SESSION['userData'])) {
-                        echo '<li><a class="btn" href="/my_page.php">' . h($_SESSION['userData']['name']) . '</a></li>';
+                        echo '<li><a class="btn" href="/my_page">' . h($_SESSION['userData']['name']) . '</a></li>';
                     } else {
                         echo '';
                     }

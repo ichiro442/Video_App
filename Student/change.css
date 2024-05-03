@@ -48,6 +48,9 @@ input[type="button"] {
     flex-grow: 1;
     /* 横方向に均等なスペースを占める */
 }
+input[type="file"] {
+    margin: 10px 0;
+}
 
 /* プレビュー画像の高さと幅を指定 */
 #preview {

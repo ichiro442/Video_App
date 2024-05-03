@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
+    padding-top: 80px;
     background-color: #f4f4f4;
   }
   .container {
@@ -180,7 +180,7 @@ body {
 }
 
 /* ------------------- */
-/* header */
+/* header.php */
 /* ------------------- */
 header {
   justify-content: space-between !important;
@@ -235,7 +235,7 @@ header {
 }
 
 /* ------------------- */
-/* teacher_detail 講師詳細画面 */
+/* 講師詳細画面 teacher_detail.php */
 /* ------------------- */
 .teacher-detail-box {
   display: flex;
@@ -321,4 +321,62 @@ height: 100%;
     right: 1rem;
     cursor: pointer;
 }
+/* ------------------- */
+/* 講師検索 index.php */
+/* ------------------- */
+.search-container {
+  margin-right: 20px;
+  border: 1px solid #ccc;
+  width: 20%;
+  align-items: normal;
+}
 
+.search-container h2 {
+  margin-bottom: 10px;
+}
+.search-container form {
+  width: 80%;
+}
+
+.search-container input,
+.search-container select {
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 100%;
+}
+
+.teacher-list {
+  border: 1px solid #ccc;
+  padding: 20px;
+  max-width: 1030px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.teacher-list h2 {
+  margin-bottom: 10px;
+}
+
+/* 講師リストのブロックごとのスタイル */
+.teacher-list div {
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  margin: 3px;
+  /* ブロックの下部に余白を追加 */
+}
+
+.teacher-block {
+  border: solid 1px #afabab;
+  border-radius: 10px;
+}
+
+/* 画像のスタイル */
+.teacher-block img {
+  max-width: 180px;
+  width: 180px;
+  max-height: 180px;
+}
+
+.teacher-block div {
+  height: 20px;
+}

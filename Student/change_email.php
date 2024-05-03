@@ -2,6 +2,7 @@
 session_start();
 require_once('../db_class.php');
 require_once('validation.php');
+
 $userData = $_SESSION['userData'];
 
 try {
@@ -16,10 +17,10 @@ try {
 
         // 結果を確認する
         if (!$result) {
-            $_SESSION['flash_message'] =  "メールアドレスが更新できませんでした。もう一度入力してください。";
+            $_SESSION['flash_message'] =  FLASH_MESSAGE[1];
             unset($_POST);
         } else {
-            $_SESSION['flash_message'] = "メールアドレスを更新しました。";
+            $_SESSION['flash_message'] = FLASH_MESSAGE[2];
             $_SESSION['userData']["nickname"] = $_POST["email"];
             $url = $dbConnect->getURL();
             header('Location:' . $url . "Student/my_page");

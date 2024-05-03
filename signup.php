@@ -2,13 +2,14 @@
 session_start();
 require_once('db_class.php');
 require_once('mail_class.php');
+require_once('definition.php');
 
 try {
   $dbConnect = new dbConnect();
   // 正規のアクセスでなければ一つ前の画面にリダイレクト
   if (!$_GET["u"]) {
     $url = $dbConnect->getURL();
-    $_SESSION['flash_message'] = "不正なアクセスです。";
+    $_SESSION['flash_message'] = FLASH_MESSAGE[14];
     header("Location: " . $url);
   }
   // 登録ボタンが押された時の処理
@@ -21,14 +22,14 @@ try {
     // パスワードの一致を確認する
     $password = 0;
     if ($userData['password'] !== $userData['confirm_password']) {
-      $_SESSION['flash_message'] = "パスワードが一致しません。もう一度入力してください。";
+      $_SESSION['flash_message'] = FLASH_MESSAGE[15];
     } else {
       $password = 1;
     }
 
     // すでに登録済みのメールアドレスの利用者はリダイレクト
     if ($dbConnect->findAllUsersByMail($_POST["email"])) {
-      $_SESSION['flash_message'] = "ご入力頂いたメールアドレスはすでに登録されています。";
+      $_SESSION['flash_message'] = FLASH_MESSAGE[16];
       header("Location: " . $url);
       exit;
     }
@@ -40,14 +41,14 @@ try {
         $directry = $_GET["u"] == "teacher" ? "Teacher" : "Student";
         echo "<p class='flashMessage'>" . $_SESSION['flash_message'] . "</p>";
         $message = "仮登録が完了しました。以下のURLから本登録を完了させてください。\n" .
-          $url . $directry . "/register_confirm.php?s=" . $shash . "&m=" . urlencode($_POST["email"]);
+          $url . $directry . "/register_confirm?s=" . $shash . "&m=" . urlencode($_POST["email"]);
         $mailer = new mail();
         $mailer->setTo($_POST["email"], $_POST["last_name"]);
-        $mailer->setSubject('【サービス名】　本登録のご案内');
+        $mailer->setSubject(MAIL[2]);
         $mailer->setBody($message);
         $mailer->send();
 
-        $_SESSION['flash_message'] = "仮登録完了。\nご登録頂いたメールアドレスに本登録ご案内メールをお送りしました。\n引き続き本登録を行ってください。";
+        $_SESSION['flash_message'] = FLASH_MESSAGE[17];
         header("Location: " . $url . $directry . "/login");
         exit;
       } else {
@@ -69,7 +70,7 @@ require_once('header.php');
 <body>
   <?php require_once('modal_message.php') ?>
   <div class="container">
-    <h2>新規登録</h2>
+    <h2><?php echo h($title) ?></h2>
     <form method="post">
       <div class="form-group">
         <label for="last_name">名字</label>

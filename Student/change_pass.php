@@ -2,6 +2,7 @@
 session_start();
 require_once('../db_class.php');
 require_once('validation.php');
+
 $userData = $_SESSION['userData'];
 
 try {
@@ -25,17 +26,17 @@ try {
 
             // パスワードの一致を確認する
             if ($_POST['newPassword'] !== $_POST['newPasswordConfirm']) {
-                $_SESSION['flash_message'] =  "新しいパスワードと新しいパスワードの確認が一致しません。もう一度入力してください。";
+                $_SESSION['flash_message'] =  FLASH_MESSAGE[5];
                 unset($_POST);
             } else {
-                $_SESSION['flash_message'] = "パスワードを更新しました。";
+                $_SESSION['flash_message'] = FLASH_MESSAGE[6];
                 $_SESSION['userData']["password"] = $_POST['newPassword'];
                 $url = $dbConnect->getURL();
                 header('Location:' . $url . "Student/my_page");
                 exit;
             }
         } else {
-            $_SESSION['flash_message'] = "パスワードが違います。";
+            $_SESSION['flash_message'] = FLASH_MESSAGE[7];
             header('Location: ' . $_SERVER['REQUEST_URI']);
             exit;
         }

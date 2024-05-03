@@ -87,7 +87,7 @@ require_once('header.php');
                 <div class="column-cente profile-picture">
                     <img src="../uploaded_pictures/<?php echo h($user["picture"]) ?>" alt="ユーザーの画像">
                 </div>
-                <div class="column-right" style="text-align: center;"><a href="change_picture.php">写真変更</a></div>
+                <div class="column-right" style="text-align: center;"><a href="change_picture">写真変更</a></div>
             </div>
         </div>
         <div class="profile-right">
@@ -99,22 +99,22 @@ require_once('header.php');
             <div class="row flex">
                 <div class="column-left"><span>名前:</span></div>
                 <div class="column-center"><?php echo h($user["first_name"]) ?> <?php echo h($user["last_name"]) ?></div>
-                <div class="column-right"><a href="change_name.php"></a></div>
+                <div class="column-right"><a href="change_name"></a></div>
             </div>
             <div class="row flex">
                 <div class="column-left"><span>ニックネーム:</span></div>
                 <div class="column-center"><?php echo h($user["nickname"]) ?></div>
-                <div class="column-right"><a href="change_nickname.php">変更</a></div>
+                <div class="column-right"><a href="change_nickname">変更</a></div>
             </div>
             <div class="row flex">
                 <div class="column-left"><span>メールアドレス:</span></div>
                 <div class="column-center"><?php echo h($user["email"]) ?></div>
-                <div class="column-right"><a href="change_email.php">変更</a></div>
+                <div class="column-right"><a href="change_email">変更</a></div>
             </div>
             <div class="row flex">
                 <div class="column-left"></div>
                 <div class="column-center"></div>
-                <div class="column-right"><a href="change_pass.php">パスワード変更</a></div>
+                <div class="column-right"><a href="change_pass">パスワード変更</a></div>
             </div>
         </div>
     </div>

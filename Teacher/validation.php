@@ -1,16 +1,19 @@
 <?php
+require_once('../definition.php');
+
 $dbConnect = new dbConnect();
 
 if ((!isset($_SESSION["userData"]) || !empty($_SESSION["userData"])) && $_SESSION["userType"] == "teacher") {
-    // $dbConnect->initPDO();
-    // // すべての講師を取得する
-    // $teachers = $dbConnect->findAllTeachers();
+    $dbConnect->initPDO();
+    $uri =  $_SERVER["REQUEST_URI"];
+    // すべての講師を取得する
+    $teacher = $dbConnect->findByMail($_SESSION["userData"]["email"], $uri);
 } else if ($_SESSION["userType"] == "student") {
-    $_SESSION['flash_message'] = "講師は生徒画面にログインできません。";
+    $_SESSION['flash_message'] = FLASH_MESSAGE[19];
     $url = $dbConnect->getURL();
-    header('Location:' . $url . "Teacher");
+    header('Location:' . $url . "Student");
 } else {
-    $_SESSION['flash_message'] = "ログインまたは登録を完了してください。";
+    $_SESSION['flash_message'] = FLASH_MESSAGE[12];
     $url = $dbConnect->getURL();
-    header('Location:' . $url . "Student/login");
+    header('Location:' . $url . "Teacher/login");
 }

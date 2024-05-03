@@ -1,14 +1,18 @@
 <?php
 session_start();
 require_once('../db_class.php');
+require_once('validation.php');
 
-// 登録者でなければ講師検索画面にリダイレクト
-if ($_SESSION['userType'] !== "student") {
-    $_SESSION['flash_message'] = "ログインしていません。";
-    $dbConnect = new dbConnect();
-    $url = $dbConnect->getURL();
-    header("Location: " . $url . "Student");
-    exit;
+// 公開ページからの遷移でない場合
+if ($_GET["u"] !== "un") {
+    // 登録者でなければ講師検索画面にリダイレクト
+    if ($_SESSION['userType'] !== "student") {
+        $_SESSION['flash_message'] = FLASH_MESSAGE[13];
+        $dbConnect = new dbConnect();
+        $url = $dbConnect->getURL();
+        header("Location: " . $url . "Student");
+        exit;
+    }
 }
 
 try {
@@ -35,7 +39,7 @@ require_once('header.php');
             <div class="img-box">
                 <?php
                 if (isset($teacher["picture"]) || !is_null($teacher["picture"])) {
-                    echo '<img src="../Uploadpicture/' . h($teacher["picture"]) . '" alt="講師の画像"> ';
+                    echo '<img src="../uploaded_pictures/' . h($teacher["picture"]) . '" alt="講師の画像"> ';
                 } else {
                     echo '<img src="../Img/person.jpg" alt="デフォルトの画像"> ';
                 }

@@ -149,6 +149,7 @@ class dbConnect
         $query .= ", nickname=:nickname";
         $query .= ", picture=:picture";
         $query .= ", email=:email";
+        $query .= ", country=:country";
         $query .= ", password=:password";
         $query .= ", status=:status";
         $query .= ", shash=:shash";
@@ -157,10 +158,10 @@ class dbConnect
         $stmt->bindvalue(":first_name", $teacher["first_name"]);
         $stmt->bindvalue(":last_name", $teacher["last_name"]);
         $stmt->bindvalue(":nickname", $teacher["nickname"]);
-        $stmt->bindvalue(":picture", $teacher["picture"]);
         if ($this->findAllUsersByMail($teacher["email"])) return false;
 
         $stmt->bindvalue(":email", $teacher["email"]);
+        $stmt->bindvalue(":country", $teacher["country"]);
         $stmt->bindvalue(":password", $teacher["password"]);
         $stmt->bindvalue(":status", $teacher["status"]);
         $stmt->bindvalue(":shash", $teacher["shash"]);
@@ -192,6 +193,7 @@ class dbConnect
         $query .= ", nickname=:nickname";
         $query .= ", picture=:picture";
         $query .= ", email=:email";
+        $query .= ", country=:country";
         $query .= ", password=:password";
         $query .= ", status=:status";
         $query .= ", shash=:shash";
@@ -204,6 +206,7 @@ class dbConnect
         if ($this->findAllUsersByMail($student["email"])) return false;
 
         $stmt->bindvalue(":email", $student["email"]);
+        $stmt->bindvalue(":country", $student["country"]);
         $stmt->bindvalue(":password", $student["password"]);
         $stmt->bindvalue(":status", $student["status"]);
         $stmt->bindvalue(":shash", $student["shash"]);

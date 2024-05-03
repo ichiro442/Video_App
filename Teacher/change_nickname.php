@@ -15,10 +15,10 @@ try {
         $result = $dbConnect->updateOneColumn($userData["id"], $userData["nickname"], $column, $uri);
         // 更新結果を確認する
         if (!$result) {
-            $_SESSION['flash_message'] =  "ニックネームが更新できませんでした。もう一度入力してください。";
+            $_SESSION['flash_message'] =  FLASH_MESSAGE[3];
             unset($_POST);
         } else {
-            $_SESSION['flash_message'] = "ニックネームを更新しました。";
+            $_SESSION['flash_message'] = FLASH_MESSAGE[4];
             $_SESSION['userData']["nickname"] = $_POST["nickname"];
             $url = $dbConnect->getURL();
             header('Location:' . $url . "Teacher");

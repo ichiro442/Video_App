@@ -48,7 +48,7 @@ try {
             $url = $dbConnect->getURL();
             $_SESSION["userType"] = "student";
             $_SESSION["userData"] = $students;
-            header("Location: " . $url . "Student/index");
+            header("Location: " . $url . "Student");
             exit;
         }
     }

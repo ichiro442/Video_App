@@ -10,52 +10,64 @@ $userData = $_SESSION['userData'];
  */
 function uploadFile($filedata)
 {
-    // 空なら処理しない
-    if (empty($filedata)) return false;
-    $dbConnect = new dbConnect();
+    try {
 
-    // アップするディレクトリ
-    $uploadDir = $dbConnect->getdir();
 
-    if (!file_exists($uploadDir)) {
-        if (!mkdir($uploadDir, 0777, true)) {
-            throw new Exception("フォルダを作成できません");
+        // 空なら処理しない
+        if (empty($filedata)) return false;
+        $dbConnect = new dbConnect();
+
+        // アップするディレクトリ
+        $uploadDir = $dbConnect->getdir();
+
+        if (!file_exists($uploadDir)) {
+            if (!mkdir($uploadDir, 0777, true)) {
+                throw new Exception("フォルダを作成できません");
+            }
         }
-    }
-    // ファイルサイズチェック
-    $fileSize = $filedata['size'];
+        // ファイルサイズチェック
+        $fileSize = $filedata['size'];
 
-    // ファイルサイズが1MB(1KB = 1024byte, 1MB = 1024KB)未満かどうか
-    if ($fileSize > (1024 * 1024)) {
-        throw new Exception("ファイルサイズは1MB未満にしてください。");
-    }
+        // ファイルサイズが1MB(1KB = 1024byte, 1MB = 1024KB)未満かどうか
+        if ($fileSize > (1024 * 1024) || $fileSize == 0) {
+            $_SESSION['flash_message'] = FLASH_MESSAGE["FILE"][1];
+            header('Location:' . $_SERVER['PHP_SELF']);
+            exit;
+        }
 
-    // オリジナルファイル名
-    $fileName =  basename($filedata['name']);
-    // 一時保存先
-    $tmp_path = $filedata['tmp_name'];
+        // オリジナルファイル名
+        $fileName =  basename($filedata['name']);
+        // 一時保存先
+        $tmp_path = $filedata['tmp_name'];
 
-    // オリジナルのファイル名から拡張子を取得してチェックする
-    $file_ext = pathinfo($fileName, PATHINFO_EXTENSION);
-    if (!in_array(strtolower($file_ext), ["jpg", "jpeg", "png"])) {
-        throw new Exception("画像ファイルを添付してください。");
-    }
+        // オリジナルのファイル名から拡張子を取得してチェックする
+        $file_ext = pathinfo($fileName, PATHINFO_EXTENSION);
+        if (!in_array(strtolower($file_ext), ["jpg", "jpeg", "png"])) {
+            $_SESSION['flash_message'] = FLASH_MESSAGE["FILE"][2];
+            header('Location:' . $_SERVER['PHP_SELF']);
+            exit;
+        }
 
-    //ファイル名のハッシュ化
-    $newSaveFilename = date("YmdHis") . substr(md5($fileName), 0, 10) . "." . $file_ext;
-    $newSaveFilePath = $uploadDir . $newSaveFilename;
+        //ファイル名のハッシュ化
+        $newSaveFilename = date("YmdHis") . substr(md5($fileName), 0, 10) . "." . $file_ext;
+        $newSaveFilePath = $uploadDir . $newSaveFilename;
 
-    //ファイルを移動する
-    if (is_uploaded_file($tmp_path)) {
-        if (move_uploaded_file($tmp_path, $newSaveFilePath)) {
-            return  $newSaveFilename;
+        //ファイルを移動する
+        if (is_uploaded_file($tmp_path)) {
+            if (move_uploaded_file($tmp_path, $newSaveFilePath)) {
+                return  $newSaveFilename;
+            } else {
+                throw new Exception("ファイルが移動できません。");
+            }
         } else {
-            throw new Exception("ファイルが移動できません。");
+            throw new Exception("ファイルが検証できません。");
         }
-    } else {
-        throw new Exception("ファイルが検証できません。");
+        return false;
+    } catch (Exception $e) {
+        echo "エラー";
+        echo $e->getMessage();
+        exit;
     }
-    return false;
 }
 
 try {
@@ -80,7 +92,7 @@ try {
 
         $dbConnect->updateOneColumn($userData["id"], $user["picture"], $column, $uri);
         $_SESSION['userData'] = $userData;
-        $_SESSION['flash_message'] = "画像を更新しました。";
+        $_SESSION['flash_message'] = FLASH_MESSAGE[8];
         $url = $dbConnect->getURL();
 
         header('Location:' . $url . "Student/my_page");
