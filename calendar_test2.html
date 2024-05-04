@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script>
+      // 現在の日付を取得
+      const now = new Date();
+      let a;
+      // ドキュメントが読み込まれた時の処理
+      document.addEventListener("DOMContentLoaded", function () {
+        // カレンダー要素を取得
+        var calendarEl = document.getElementById("calendar");
+        // FullCalendarを使ってカレンダーを作成
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          // 初期表示を週間表示に設定
+          initialView: "timeGridWeek",
+          // 週の最初の曜日を現在の曜日に設定
+          firstDay: now.getDay(),
+          // イベントの時間を表示しないように設定
+          displayEventTime: false,
+          // イベントの設定
+          events: [
+            {
+              title: "○",
+              start: "2024-05-06 12:00",
+              end: "2024-05-06 12:30",
+            },
+          ],
+          // イベントを選択可能にする
+          selectable: true,
+          // 選択時にミラーを表示する
+          selectMirror: true,
+          // イベントを選択した時の処理
+          select: function (arg) {
+            // ダイアログを表示して選択を求める
+            Swal.fire({
+              html: '<div class="mb-7">可否を入力ください</div>',
+              icon: "info",
+              showDenyButton: true,
+              showCancelButton: true,
+              buttonsStyling: false,
+              confirmButtonText: "○",
+              denyButtonText: "×",
+              cancelButtonText: "Cancel",
+              customClass: {
+                confirmButton: "btn btn-primary",
+                denyButton: "btn btn-active-light",
+                cancelButton: "btn btn-active-light",
+              },
+            }).then(function (result) {
+              let start = arg.start;
+              const end = arg.end;
+              // ○が選択された場合
+              if (result.value) {
+                // 選択された範囲内のイベントを削除
+                calendar
+                  .getEvents()
+                  .filter((s) => {
+                    return start <= s.start && s.end <= end;
+                  })
+                  .forEach((s) => {
+                    s.remove();
+                  });
+                // 選択された範囲にイベントを追加
+                while (start < end) {
+                  let tmpEnd = new Date(start.getTime());
+                  tmpEnd.setMinutes(tmpEnd.getMinutes() + 30);
+                  calendar.addEvent({
+                    title: "○",
+                    start: start,
+                    end: tmpEnd,
+                    allDay: arg.allDay,
+                  });
+                  start = tmpEnd;
+                }
+                // 選択を解除
+                calendar.unselect();
+                // ×が選択された場合
+              } else if (result.isDenied) {
+                // 選択された範囲内のイベントを削除
+                calendar
+                  .getEvents()
+                  .filter((s) => {
+                    return start <= s.start && s.end <= end;
+                  })
+                  .forEach((s) => {
+                    s.remove();
+                  });
+                // 選択された範囲にイベントを追加
+                while (start < end) {
+                  let tmpEnd = new Date(start.getTime());
+                  tmpEnd.setMinutes(tmpEnd.getMinutes() + 30);
+                  calendar.addEvent({
+                    title: "×",
+                    start: start,
+                    end: tmpEnd,
+                    allDay: arg.allDay,
+                  });
+                  start = tmpEnd;
+                }
+                // 選択を解除
+                calendar.unselect();
+                // キャンセルが選択された場合
+              } else if (result.dismiss === "cancel") {
+                // 選択を解除
+                calendar.unselect();
+              }
+            });
+          },
+        });
+        // カレンダーを描画
+        calendar.render();
+      });
+    </script>
+    <style>
+      .fc-event-title {
+        text-align: center;
+      }
+
+      .fc-timegrid-event-harness-inset {
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="calendar"></div>
+  </body>
+</html>

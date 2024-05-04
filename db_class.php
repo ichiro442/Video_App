@@ -104,15 +104,16 @@ class dbConnect
     }
 
     // 【共通】ユーザーを仮登録する
-    public function insertUser($first_name, $last_name, $nickname, $email, $password, $table)
+    public function insertUser($first_name, $last_name, $nickname, $email, $country, $password, $table)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO `$table`(first_name,last_name,nickname,email,password,shash) VALUE (:first_name,:last_name,:nickname,:email,:password,:shash)");
+        $stmt = $this->pdo->prepare("INSERT INTO `$table`(first_name,last_name,nickname,email,country,password,shash) VALUE (:first_name,:last_name,:nickname,:email,:country,:password,:shash)");
         $stmt->bindvalue(":first_name", $first_name);
         $stmt->bindvalue(":last_name", $last_name);
         $stmt->bindvalue(":nickname", $nickname);
         if ($this->findAllUsersByMail($email)) return false;
 
         $stmt->bindvalue(":email", $email);
+        $stmt->bindvalue(":country", $country);
         $phash = password_hash($password, PASSWORD_DEFAULT);
         $stmt->bindvalue(":password", $phash);
         $shash = substr(md5($last_name . $email), 0, 10);
@@ -147,7 +148,7 @@ class dbConnect
         $query .= " first_name=:first_name";
         $query .= ", last_name=:last_name";
         $query .= ", nickname=:nickname";
-        $query .= ", picture=:picture";
+        // $query .= ", picture=:picture";
         $query .= ", email=:email";
         $query .= ", country=:country";
         $query .= ", password=:password";
@@ -158,8 +159,7 @@ class dbConnect
         $stmt->bindvalue(":first_name", $teacher["first_name"]);
         $stmt->bindvalue(":last_name", $teacher["last_name"]);
         $stmt->bindvalue(":nickname", $teacher["nickname"]);
-        if ($this->findAllUsersByMail($teacher["email"])) return false;
-
+        // $stmt->bindvalue(":picture", $teacher["picture"]);
         $stmt->bindvalue(":email", $teacher["email"]);
         $stmt->bindvalue(":country", $teacher["country"]);
         $stmt->bindvalue(":password", $teacher["password"]);
@@ -191,7 +191,7 @@ class dbConnect
         $query .= " first_name=:first_name";
         $query .= ", last_name=:last_name";
         $query .= ", nickname=:nickname";
-        $query .= ", picture=:picture";
+        // $query .= ", picture=:picture";
         $query .= ", email=:email";
         $query .= ", country=:country";
         $query .= ", password=:password";
@@ -202,9 +202,7 @@ class dbConnect
         $stmt->bindvalue(":first_name", $student["first_name"]);
         $stmt->bindvalue(":last_name", $student["last_name"]);
         $stmt->bindvalue(":nickname", $student["nickname"]);
-        $stmt->bindvalue(":picture", $student["picture"]);
-        if ($this->findAllUsersByMail($student["email"])) return false;
-
+        // $stmt->bindvalue(":picture", $student["picture"]);
         $stmt->bindvalue(":email", $student["email"]);
         $stmt->bindvalue(":country", $student["country"]);
         $stmt->bindvalue(":password", $student["password"]);

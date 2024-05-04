@@ -1,14 +1,18 @@
 <?php
 session_start();
+require_once('db_class.php');
 
-if ($_POST) {
-  var_dump($_POST);
+if ($_POST["rating"]) {
+  $dbConnect = new dbConnect();
+  $url = $dbConnect->getURL();
+  // レッスンをした講師と生徒のIDを取得する
+  // uriを取得して講師か生徒かを判断する
+  // 評価を登録する
+  // 講師と生徒のそれぞれのindexの画面にリダイレクトする
+  $_SESSION["flash_message"] = "評価が " . $_POST["rating"] . " / 5 で送信されました。";
+  header("Location: " . $url . "Student");
   exit;
 }
-// レッスンをした講師と生徒のIDを取得する
-// uriを取得して講師か生徒かを判断する
-// 評価を登録する
-// 講師と生徒のそれぞれのindexの画面にリダイレクトする
 
 $title = "レビュー";
 require_once('header.php');
@@ -22,49 +26,11 @@ require_once('header.php');
     margin: 0;
     font-size: 1.5rem;
   }
-
-  .rating-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 2rem;
-  }
-
-  .star {
-    color: #ccc;
-    cursor: pointer;
-    font-size: 5rem;
-    /* 星の大きさを大きく */
-  }
-
-  .star.checked {
-    color: #ffc107;
-  }
-
-  .star:hover {
-    color: #ff9800;
-  }
-
-  .rating-description {
-    margin-top: 10px;
-  }
-
-  .submit-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1.2rem;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-
-  .submit-button:hover {
-    background-color: #45a049;
-  }
 </style>
 
 <body>
+  <?php require_once('modal_message.php'); ?>
+
   <div class="rating-container">
     <div>
       <span class="star" data-value="1">&#9733;</span>
@@ -76,6 +42,12 @@ require_once('header.php');
     <input type="text" name="test" value="" hidden>
     <div class="rating-description">
       評価: <span id="ratingValue">0</span> / 5
+    </div>
+    <div class="rating-description">
+      <label for="">コメント</label>
+    </div>
+    <div class="rating-description">
+      <textarea name="comment" id="" cols="60" rows="7"></textarea>
     </div>
     <button class="submit-button" onclick="submitRating()">送信する</button>
     <form id="ratingForm" method="POST">
@@ -108,17 +80,15 @@ require_once('header.php');
 
     function submitRating() {
       const rating = parseInt(ratingValue.textContent);
-      alert(`評価が ${rating} / 5 で送信されました。`);
+
       // PHPのinput要素のvalueに評価の値を設定する
       document.getElementById('ratingInput').value = rating;
 
       // ページをリロードせずにフォームを送信する
       document.getElementById('ratingForm').submit();
-
-      // OKボタンが押された後にindex.htmlに遷移する
-      // window.location.href = "index.html";
     }
   </script>
+  <?php require_once('footer.php'); ?>
 </body>
 
 </html>

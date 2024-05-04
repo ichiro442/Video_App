@@ -3,6 +3,8 @@ session_start();
 require_once('../db_class.php');
 require_once('header_function.php');
 require_once('../mail_class.php');
+require_once('../definition.php');
+
 
 // 仮登録データを取得する
 try {
@@ -11,6 +13,13 @@ try {
         $dbConnect->initPDO();
         $uri =  $_SERVER["REQUEST_URI"];
         $students = $dbConnect->findByMail($_GET['m'], $uri);
+        $selected = "selected";
+        if ($students["status"] == 1) {
+            $_SESSION["flash_message"] = FLASH_MESSAGE[20];
+            $url = $dbConnect->getURL();
+            header("Location: " . $url . "Student");
+            exit;
+        }
     }
     if (!isset($_GET['m'])) {
         echo "エラー";
@@ -25,7 +34,7 @@ try {
     if (!empty($_GET['m'])) {
         if (!empty($_POST['submit'])) {
             // ステータスを本登録にして講師データをアップデートする
-            $students["status"] = 2;
+            $_POST["status"] = REGISTER[1];
             $dbConnect->updateStudent($students["id"], $_POST);
 
             $email = $students["email"];
@@ -48,6 +57,7 @@ try {
             $url = $dbConnect->getURL();
             $_SESSION["userType"] = "student";
             $_SESSION["userData"] = $students;
+            $_SESSION["flash_message"] = FLASH_MESSAGE[18];
             header("Location: " . $url . "Student");
             exit;
         }
@@ -79,19 +89,30 @@ $title = "生徒新規登録"
         <form method="post">
             <div class="form-group">
                 <label for="last_name">名字</label>
-                <input type="text" id="name" name="last_name" value=<?php echo h($students['last_name']) ?> required />
+                <input type="text" name="last_name" value=<?php echo h($students['last_name']) ?> required />
             </div>
             <div class="form-group">
                 <label for="first_name">名前</label>
-                <input type="text" id="name" name="first_name" value=<?php echo h($students['first_name']) ?> required />
+                <input type="text" name="first_name" value=<?php echo h($students['first_name']) ?> required />
             </div>
             <div class="form-group">
                 <label for="nickname">ニックネーム</label>
-                <input type="text" id="nickname" name="nickname" value=<?php echo h($students['nickname']) ?> required />
+                <input type="text" name="nickname" value=<?php echo h($students['nickname']) ?> required />
+            </div>
+            <div class="form-group">
+                <label for="country">国籍</label>
+                <div class="">
+                    <select name="country">
+                        <?php foreach (COUNTRY as $country) : ?>
+                            <?php if ($country !== $students['country']) $selected = ""; ?>
+                            <option name="<?php echo h($country) ?>" value="<?php echo h($country) ?>" <?php echo $selected ?>><?php echo h($country) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
             <div class="form-group">
                 <label for="email">メールアドレス</label>
-                <input type="email" id="email" name="email" value=<?php echo h($students['email']) ?> required />
+                <input type="email" name="email" value=<?php echo h($students['email']) ?> required />
             </div>
             <input type="text" name="password" value=<?php echo $students['password'] ?> hidden>
             <input type="text" name="shash" value=<?php echo $students['shash'] ?> hidden>

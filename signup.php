@@ -34,9 +34,12 @@ try {
       exit;
     }
     if ($password) {
-      if (!empty($_POST["last_name"]) && !empty($_POST["first_name"]) && !empty($_POST["nickname"]) && !empty($_POST["email"]) && !empty($_POST["password"])) {
+      if (
+        !empty($_POST["last_name"]) && !empty($_POST["first_name"]) && !empty($_POST["nickname"]) &&
+        !empty($_POST["email"]) && !empty($_POST["country"]) && !empty($_POST["password"])
+      ) {
         $table = $_GET["u"] == "teacher" ? "teachers" : "students";
-        $shash = $dbConnect->insertUser($_POST["first_name"], $_POST['last_name'], $_POST["nickname"], $_POST['email'], $_POST['password'], $table);
+        $shash = $dbConnect->insertUser($_POST["first_name"], $_POST['last_name'], $_POST["nickname"], $_POST['email'], $_POST['country'], $_POST['password'], $table);
 
         $directry = $_GET["u"] == "teacher" ? "Teacher" : "Student";
         echo "<p class='flashMessage'>" . $_SESSION['flash_message'] . "</p>";
@@ -74,27 +77,38 @@ require_once('header.php');
     <form method="post">
       <div class="form-group">
         <label for="last_name">名字</label>
-        <input type="text" id="name" name="last_name" value="<?php echo h($_POST["last_name"]) ?>" required />
+        <input type="text" name="last_name" value="<?php echo h($_POST["last_name"]) ?>" required />
       </div>
       <div class="form-group">
         <label for="first_name">名前</label>
-        <input type="text" id="name" name="first_name" value="<?php echo h($_POST["first_name"]) ?>" required />
+        <input type="text" name="first_name" value="<?php echo h($_POST["first_name"]) ?>" required />
       </div>
       <div class="form-group">
         <label for="nickname">ニックネーム</label>
-        <input type="text" id="nickname" name="nickname" value="<?php echo h($_POST["nickname"]) ?>" required />
+        <input type="text" name="nickname" value="<?php echo h($_POST["nickname"]) ?>" required />
+      </div>
+      <div class="form-group">
+        <label for="nickname">国籍</label>
+        <div class="">
+          <select id="searchCountry" name="country">
+            <option value=""></option>
+            <?php foreach (COUNTRY as $country) : ?>
+              <option name="<?php echo h($country) ?>" value="<?php echo h($country) ?>"><?php echo h($country) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
       </div>
       <div class="form-group">
         <label for="email">メールアドレス</label>
-        <input type="email" id="email" name="email" value="<?php echo h($_POST["email"]) ?>" required />
+        <input type="email" name="email" value="<?php echo h($_POST["email"]) ?>" required />
       </div>
       <div class="form-group">
         <label for="password">パスワード</label>
-        <input type="password" id="password" name="password" required />
+        <input type="password" name="password" required />
       </div>
       <div class="form-group">
         <label for="confirm_password">パスワード確認</label>
-        <input type="password" id="confirm_password" name="confirm_password" required />
+        <input type="password" name="confirm_password" required />
       </div>
       <input type="submit" name="submit" alue="登録する" />
     </form>

@@ -2,7 +2,8 @@
 session_start();
 
 // 講師と生徒の情報を取得して名前を表示する
-
+$my_name = "いちろ";
+$partner_name = "Mary";
 ?>
 
 <html>
@@ -32,9 +33,11 @@ session_start();
   <!-- 自分のカメラ映像とマイク -->
   <img id="local-video" src="Img/0.png"></img>
   <audio id="local-audio" autoplay muted></audio>
+
   <!-- 相手のカメラ映像とマイク -->
   <img id="remote-video" src="Img/1.png"></img>
   <audio id="remote-audio" autoplay></audio>
+
   <!-- 画面下部の操作バー -->
   <div id="footer" class="bg-dark w-100 d-flex align-items-center" style="position: absolute; bottom: 0; z-index: 10;">
     <!-- マイクミュートボタン -->

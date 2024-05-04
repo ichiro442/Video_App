@@ -219,3 +219,56 @@ header {
 .teacher-block div {
   height: 20px;
 }
+/* ------------------- */
+/* signup.php 登録画面 */
+/* ------------------- */
+ select {
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+}
+
+/* ------------------- */
+/* rating.php 評価画面 */
+/* ------------------- */
+.rating-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 2rem;
+}
+
+.star {
+  color: #ccc;
+  cursor: pointer;
+  font-size: 5rem;
+  /* 星の大きさを大きく */
+}
+
+.star.checked {
+  color: #ffc107;
+}
+
+.star:hover {
+  color: #ff9800;
+}
+
+.rating-description {
+  margin-top: 10px;
+}
+
+.rating-container button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}
+

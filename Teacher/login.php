@@ -57,7 +57,8 @@ require_once('header_function.php');
     <label for="password">パスワード:</label>
     <input type="password" id="password" name="password" required />
     <input type="submit" name="submit" value="ログイン" />
-    <a href="../signup?u=teacher">ご登録はこちらです。</a>
+    <a href="../signup?u=student">生徒ご登録はこちらです。</a></br>
+    <a href="../signup?u=teacher">講師ご登録はこちらです。</a>
   </form>
 
 </body>

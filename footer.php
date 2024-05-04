@@ -14,13 +14,11 @@
         // モーダル表示関数
         function showModal() {
             $('#modalArea').fadeIn();
-            $('#flashMessageDisplay').text(flash_message); // モーダル内にフラッシュメッセージを表示
+            $('#flashMessageDisplay').html(flash_message.replace(/\n/g, '<br/>'));
         }
 
         function deleteSession() {
             var currentURL = window.location.href;
-            // currentURL = currentURL.split('?')[0];
-            // console.log(url);
             var url = 'delete_flash.php';
             if (currentURL.indexOf("Teacher") !== -1 || currentURL.indexOf("Student") !== -1) {
                 var url = '../delete_flash.php';

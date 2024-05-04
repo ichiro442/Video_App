@@ -3,6 +3,8 @@ session_start();
 require_once('../db_class.php');
 require_once('validation.php');
 
+// var_dump($teacher);
+// exit;
 $title = "講師マイページ";
 require_once('header.php');
 

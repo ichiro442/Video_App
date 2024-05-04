@@ -115,7 +115,7 @@ require_once('header.php');
     <div class="register-item flex">
         <div class="form-item-input">
             <div class="flex">
-                <img id="preview" src="<?php echo h($userData["picture"]) ?>" alt="">
+                <img id="preview" src="../uploaded_pictures/<?php echo h($userData["picture"]) ?>" alt="">
             </div>
             <input type="hidden" name="MAX_FILE_SIZE" value="1048576">
             <input type="file" name="picture" accept="image/*" required="required" onchange="previewImage(this);">

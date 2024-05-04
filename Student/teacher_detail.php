@@ -21,7 +21,7 @@ try {
     $pdo = $dbConnect->getPDO();
 
     $stmt = $pdo->prepare("SELECT * FROM teachers WHERE id=:id ");
-    $stmt->bindvalue(":id", $_GET["id"]);
+    $stmt->bindValue(":id", $_GET["id"], PDO::PARAM_INT);
     $stmt->execute();
     $teacher = $stmt->fetch();
 } catch (PDOException $e) {

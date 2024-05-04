@@ -12,6 +12,13 @@ try {
         $dbConnect->initPDO();
         $uri =  $_SERVER["REQUEST_URI"];
         $teacher = $dbConnect->findByMail($_GET['m'], $uri);
+        $selected = "selected";
+        if ($teacher["status"] == 1) {
+            $_SESSION["flash_message"] = FLASH_MESSAGE[20];
+            $url = $dbConnect->getURL();
+            header("Location: " . $url . "Teacher");
+            exit;
+        }
     }
     if (!isset($_GET['m'])) {
         echo "エラー";
@@ -26,9 +33,8 @@ try {
     if (!empty($_GET['m'])) {
         if (!empty($_POST['submit'])) {
             // ステータスを本登録にして講師データをアップデートする
-            $teacher["status"] = 2;
+            $_POST["status"] = REGISTER[1];
             $dbConnect->updateTeacher($teacher["id"], $_POST);
-
             $email = $teacher["email"];
             $name = $teacher["last_name"];
 
@@ -48,7 +54,7 @@ try {
             $mailer->send();
             $url = $dbConnect->getURL();
             $_SESSION["userType"] = "teacher";
-            $_SESSION["userType"] = $teacher;
+            $_SESSION["userData"] = $teacher;
             $_SESSION["flash_message"] = FLASH_MESSAGE[18];
             header("Location: " . $url . "Teacher");
             exit;
@@ -91,6 +97,17 @@ $title = "講師新規登録";
             <div class="form-group">
                 <label for="nickname">ニックネーム</label>
                 <input type="text" id="nickname" name="nickname" value=<?php echo h($teacher['nickname']) ?> required />
+            </div>
+            <div class="form-group">
+                <label for="country">国籍</label>
+                <div class="">
+                    <select id="searchCountry" name="country">
+                        <?php foreach (COUNTRY as $country) : ?>
+                            <?php if ($country !== $students['country']) $selected = ""; ?>
+                            <option name="<?php echo h($country) ?>" value="<?php echo h($country) ?>" selected><?php echo h($country) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
             <div class="form-group">
                 <label for="email">メールアドレス</label>

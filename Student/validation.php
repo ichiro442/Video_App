@@ -3,7 +3,7 @@ require_once('../definition.php');
 $dbConnect = new dbConnect();
 
 if ((!isset($_SESSION["userData"]) ||
-        !empty($_SESSION["userData"])) && $_SESSION["userType"] == "student" ||
+        !empty($_SESSION["userData"]) && $_SESSION["userData"]["status"] == 1) && $_SESSION["userType"] == "student" ||
     $_GET["u"] == "un"
 ) {
     $dbConnect->initPDO();
@@ -15,6 +15,7 @@ if ((!isset($_SESSION["userData"]) ||
     header('Location:' . $url . "Teacher");
 } else {
     $_SESSION['flash_message'] = FLASH_MESSAGE[12];
+    if ($_SESSION["userData"]["status"] == 0) $_SESSION['flash_message'] = FLASH_MESSAGE[21];
     $url = $dbConnect->getURL();
     header('Location:' . $url . "Student/login");
 }
