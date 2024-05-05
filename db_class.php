@@ -123,9 +123,8 @@ class dbConnect
     }
 
     // 【共通】一つのデータを更新
-    public function updateOneColumn($userId, $value, $column, $uri)
+    public function updateOneColumn($userId, $value, $column, $table)
     {
-        $table = preg_match('/Teacher/', $uri) ? "teachers" : "students";
         $query = "update `$table` set";
         $query .= " `$column`=:value";
         $query .= " WHERE id=:id";
@@ -134,7 +133,104 @@ class dbConnect
         $stmt->bindvalue(":id", $userId);
         return $stmt->execute();
     }
+    // 【共通】【動的SQL】SELECT * FROM houses WHERE (AAA = :AAA OR BBB = :BBB) AND CCC = :CCC;
+    // ABCをすべて満たすユーザーを取得する
+    // WHERE句を生成する
+    private function buildSearchWhereQuery($words)
+    {
+        $sql = "";
+        $andcount = 0;
+        foreach ($words as $key => $value) {
+            // 配列の場合はこの（）の中を生成する
+            if (!empty($value) && is_array($value)) {
 
+                if ($andcount > 0) $sql .= " AND";
+
+                $sql .= " (";
+
+                $orcount = 0;
+                foreach ($value as $key2 => $value2) {
+
+                    if ($value2 == "") continue;
+
+                    if ($orcount > 0) $sql .= " OR";
+
+                    $sql .= " $key LIKE :$key$key2";
+                    $orcount++;
+                }
+
+                // ORがない場合は1=1を末尾に追記する(WEHRE 1＝1にする)
+                if ($orcount == 0) $sql .= "1=1";
+
+                $sql .= ")";
+                $andcount++;
+            } elseif (isset($value) && $value !== "") { // 配列じゃない場合
+                //指定なしの場合はスキップする
+                if ($value == "") continue;
+
+                //最初のターン以外はANDを末尾に追記する
+                if ($andcount > 0) $sql .= " AND";
+
+                $sql .= " $key LIKE :$key";
+                $andcount++;
+            }
+        }
+        return $sql;
+    }
+    // 【共通】【動的SQL】検索条件をSQLクエリにバインドする
+    private function bindSearchParams($words, $sql)
+    {
+        $stmt = $this->pdo->prepare($sql);
+        if ($this->checkSearchWords($words)) {
+            //渡されたを連想配列で取り出す
+            foreach ($words as $key => $value) {
+
+                //値が「空でない・配列」だった場合の処理
+                if (!empty($value) && is_array($value)) {
+                    foreach ($value as $key2 => $value2) {
+                        if ($value2 == "") continue;
+                        $stmt->bindValue(":$key$key2", "%" . $value2 . "%", PDO::PARAM_STR);
+                        //デバック用
+                        // $sql = str_replace(":$key$key2","%".$value2."%",$sql);
+                    }
+                } elseif (isset($value) && $value !== "") {
+                    // if ($value == "指定なし") continue;
+                    if ($value == "") continue;
+                    $stmt->bindValue(":$key",  "%" . $value . "%", PDO::PARAM_STR);
+                    //デバック用
+                    // $sql = str_replace(":$key", $value, $sql);
+                }
+            }
+        }
+        return $stmt;
+    }
+    // 【共通】【動的SQL】与えられたデータが有効な検索条件を持っているかを確認する
+    public function checkSearchWords($words)
+    {
+        if (empty($words) && $words !== 0) return false;
+        foreach ($words as $key => $value) {
+            if (isset($value) && $value !== "") {
+                return true;
+            }
+        }
+        return false;
+    }
+    // 【共通】【動的SQL】渡されたデータを使ってユーザーの検索をするメソッド
+    public function searchUsers($words, $user_category)
+    {
+        $table = $user_category == 0 ? "students" : "teachers";
+        $sql = "SELECT * FROM $table";
+        $sql .= " WHERE";
+        if ($this->checkSearchWords($words)) {
+
+            $sql .= $this->buildSearchWhereQuery($words);
+        } else {
+            $sql .= " 1=1";
+        }
+        $stmt = $this->bindSearchParams($words, $sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
     /**
      * =======================
      * || 講師関連 ||
