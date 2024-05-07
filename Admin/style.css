@@ -42,6 +42,10 @@
     border: solid 1px #afabab;
     border-radius: 10px;
   }
+  .column-name {
+      background-color: #dbd6d6;
+      font-weight: bold;
+  }
   
   /* 画像のスタイル */
   .teacher-block img {

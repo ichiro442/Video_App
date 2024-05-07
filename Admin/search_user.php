@@ -132,7 +132,7 @@ $title = "ユーザー検索";
         <!-- 検索結果表示 -->
         <div class="teacher-list">
             <div class="flex" style="justify-content: unset;">
-                <div class="teacher-block">
+                <div class="teacher-block column-name">
                     <div class="id">
                         <span>ID</span>
                     </div>
