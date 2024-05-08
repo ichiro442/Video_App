@@ -2,70 +2,102 @@
 session_start();
 require_once('../db_class.php');
 require_once('validation.php');
+$userData = $_SESSION['userData'];
 
-// var_dump($teacher);
-// exit;
+/**
+ * 現在日以降の講師のスケジュールを取得する
+ */
+function searchCalendar()
+{
+    $dbConnect = new dbConnect();
+    $dbConnect->initPDO();
+    $pdo = $dbConnect->getPDO();
+    $sql = "SELECT CASE available WHEN 1 THEN '○' ELSE '×' END as title";
+    $sql .= " ,(start_time - INTERVAL 60 MINUTE) as start,(start_time - INTERVAL 30 MINUTE) as end "; //フィリピンの時間に修正
+    $sql .= "from teacher_schedules where teacher_id = :id and (start_time - INTERVAL 60 MINUTE) >= DATE_FORMAT(CURRENT_DATE,'%Y-%m-%d')";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(":id", $_SESSION["userData"]["id"], PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
+
+try {
+    // 初期表示の場合
+    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+        $dbConnect = new dbConnect();
+        $dbConnect->initPDO();
+        $pdo = $dbConnect->getPDO();
+        $sql = "SELECT CASE available WHEN 1 THEN '○' ELSE '×' END as title";
+        $sql .= " ,(start_time - INTERVAL 60 MINUTE) as start,(start_time - INTERVAL 30 MINUTE) as end "; //フィリピンの時間に修正
+        $sql .= "from teacher_schedules where teacher_id = :id and (start_time - INTERVAL 60 MINUTE) >= DATE_FORMAT(CURRENT_DATE,'%Y-%m-%d')";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(":id", $_SESSION["userData"]["id"], PDO::PARAM_INT);
+        $stmt->execute();
+        $calendar = searchCalendar();
+    }
+    // 保存ボタンを押した場合
+    if (!empty($_POST["submit"])) {
+        $dbConnect = new dbConnect();
+        $dbConnect->initPDO();
+        $pdo = $dbConnect->getPDO();
+        // 削除
+        $removeEvents = json_decode($_POST['removeEvents'], true);
+        // 0件以上の場合はinsertを実行
+        if ($_POST['removeEvents'] != '' && count($removeEvents) > 0) {
+            $sql = "DELETE FROM teacher_schedules WHERE ";
+            foreach ($removeEvents as $index => $event) {
+                if ($index !== 0) {
+                    $sql .= 'or';
+                }
+                $sql .= " (teacher_id = '" . $_SESSION["userData"]["id"] . "' and start_time = " . "STR_TO_DATE('" . $event["start"] . "','%Y-%m-%d %H:%i:%s'))";
+            }
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+        }
+
+        // 追加
+        $addEvents = json_decode($_POST['addEvents'], true);
+        // 0件以上の場合はinsertを実行
+        if ($_POST['addEvents'] != '' && count($addEvents) > 0) {
+            $sql = "INSERT INTO teacher_schedules (teacher_id, start_time, available, created_at, updated_at) VALUES";
+            foreach ($addEvents as $index => $event) {
+                $sql .= "(" . $_SESSION["userData"]["id"] . "," . "STR_TO_DATE('" . $event["start"] . "','%Y-%m-%d %H:%i:%s')," . $event["available"] . ", now(), now())";
+                if ($index !== array_key_last($addEvents)) {
+                    $sql .= ',';
+                }
+            }
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+        }
+        $calendar = searchCalendar();
+    }
+} catch (PDOException $e) {
+    echo "エラー";
+    echo $e->getMessage();
+    exit;
+}
+
 $title = "講師マイページ";
 require_once('header.php');
-
 ?>
+<link rel="stylesheet" href="change.css">
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding-top: 80px;
-        background-color: #f4f4f4;
+    #calendar {
+        width: 50%;
+        margin: 15px auto;
+        margin-bottom: 100px;
+        /* 画面の縦列の中央に配置 */
     }
 
-    .container {
-        width: 80%;
-        margin: auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin-top: 50px;
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .profile-info {
-        margin-bottom: 20px;
-        width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-
-    .profile-info p {
-        margin: 5px 0;
-    }
-
-    .profile-info p span {
-        font-weight: bold;
-    }
-
-    .row {
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #ccc;
-        padding: 10px;
-
-    }
-
-    .profile-right {
-        width: 100%;
-    }
-
-    /* 画像のスタイル */
-    .profile-picture img {
-        max-width: 200px;
-        max-height: 200px;
+    form {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
     }
 </style>
 
@@ -117,8 +149,20 @@ require_once('header.php');
             </div>
         </div>
     </div>
+    <!-- スケジュールカレンダー -->
+    <div class="">
+        <div id='calendar'></div>
+        <form method="post">
+            <div class="flex">
+                <input type="hidden" name="addEvents" id="addEvents" />
+                <input type="hidden" name="removeEvents" id="removeEvents" />
+                <input type="submit" name="submit" value="保存" />
+            </div>
+        </form>
+    </div>
 
 </body>
+<?php require_once('schedule_register.php'); ?>
 <?php require_once('../footer.php'); ?>
 
 </html>

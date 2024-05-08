@@ -107,7 +107,7 @@ require_once('header.php');
             <div class="flex" style="justify-content: unset;">
                 <?php foreach ($stmt as $teacher) : ?>
                     <div class="teacher-block">
-                        <a href="teacher_detail_2?id=<?php echo h($teacher['id']) ?>" target="_blank">
+                        <a href="teacher_detail?id=<?php echo h($teacher['id']) ?>" target="_blank">
                             <img src="../uploaded_pictures/<?php echo h($teacher["picture"]) ?>" alt="講師の画像">
                             <div><?php echo h($teacher['nickname']) ?></div>
                             <div><?php echo h($teacher['country']) ?></div>

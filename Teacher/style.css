@@ -1,8 +1,7 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
     background-color: #f4f4f4;
+    padding-top: 80px;
   }
   .container {
     max-width: 400px;
@@ -180,4 +179,60 @@ select {
   width: 100%;
   border: 1px solid #ccc;
 }
+/* ------------------- */
+/* index.php 講師詳細画面 */
+/* ------------------- */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
+.profile-info {
+  margin-bottom: 20px;
+  width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.row {
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+
+}
+
+.profile-right {
+  width: 100%;
+}
+
+/* 画像のスタイル */
+.profile-picture img {
+  max-width: 200px;
+  max-height: 200px;
+}
+
+/* スケジュールカレンダー */
+.fc-event-title {
+  text-align: center;
+}
+
+.fc-timegrid-event-harness-inset {
+  pointer-events: none;
+}
+
+th.fc-day-sat {
+  color: blue;
+}
+
+th.fc-day-sun {
+  color: red;
+}
+
+td.fc-timegrid-slot:not(.fc-timegrid-slot-minor) {
+  border-top: 2px solid var(--fc-border-color);
+  ;
+}
