@@ -151,12 +151,13 @@ require_once('header.php');
     </div>
     <!-- スケジュールカレンダー -->
     <div class="">
+        <h2>レッスンスケジュール</h2>
         <div id='calendar'></div>
         <form method="post">
             <div class="flex">
                 <input type="hidden" name="addEvents" id="addEvents" />
                 <input type="hidden" name="removeEvents" id="removeEvents" />
-                <input type="submit" name="submit" value="保存" />
+                <input type="submit" name="submit" value="スケジュール保存" />
             </div>
         </form>
     </div>

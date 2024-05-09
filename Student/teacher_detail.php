@@ -168,8 +168,8 @@ require_once('header.php');
             </div>
         </div>
     </div>
-    <div class="">
-        <p>カレンダー</p>
+    <div class="calendar">
+        <h2>スケジュール</h2>
         <div class=""></div>
         <table>
             <thead>

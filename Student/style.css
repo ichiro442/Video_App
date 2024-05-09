@@ -240,6 +240,7 @@ header {
 .teacher-detail-box {
   display: flex;
   width: 50%;
+  margin: 0 auto;
   /* flex-direction: column; */
   /* margin: 1rem auto; */
 }
@@ -380,6 +381,14 @@ height: 100%;
 .teacher-block div {
   height: 20px;
 }
+/* カレンダー */
+.calendar {
+  width: 50%;
+  margin: 15px auto;
+  margin-bottom: 50px;
+  /* 画面の縦列の中央に配置 */
+}
+
 /* ------------------- */
 /* signup.php 登録画面 */
 /* ------------------- */
