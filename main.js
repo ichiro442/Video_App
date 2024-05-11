@@ -188,12 +188,12 @@ const token = new SkyWayAuthToken({
 
   // STEP3: SFURoomの作成（すでに作成中の場合はその情報を取得）
   const context = await SkyWayContext.Create(token);
-  const roomId = new URLSearchParams(window.location.search).get("id");
-  if (!roomId) {
-    // Room名が分からない場合は警告を出して何もしない
-    alert('Room名が不明です');
-    return;
-  }
+  const roomId = new URLSearchParams(window.location.search).get("lesson");
+  // if (!roomId) {
+  //   // Room名が分からない場合は警告を出して何もしない
+  //   document.getElementById('submit-button').click();
+  //   return;
+  // }
   const room = await SkyWayRoom.FindOrCreate(context, {
     type: 'sfu',
     name: roomId,

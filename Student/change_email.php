@@ -21,7 +21,7 @@ try {
             unset($_POST);
         } else {
             $_SESSION['flash_message'] = FLASH_MESSAGE[2];
-            $_SESSION['userData']["nickname"] = $_POST["email"];
+            $_SESSION['userData']["email"] = $_POST["email"];
             $url = $dbConnect->getURL();
             header('Location:' . $url . "Student/my_page");
             exit;

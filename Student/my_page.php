@@ -9,6 +9,27 @@ try {
         $dbConnect->initPDO();
         $uri =  $_SERVER["REQUEST_URI"];
         $user = $dbConnect->findByMail($_SESSION["userData"]["email"], $uri);
+
+        // student_idを使って今日以降にこの生徒が予約しているレッスンすべてを取得する
+        $lessons = $dbConnect->findLessonByID($_SESSION["userData"]["id"]);
+
+        // 予約されたすべてのレッスンに対して処理を行う
+        foreach ($lessons as $key => $lesson) {
+            // 講師IDを使って講師の情報を取得する
+            $teacher = $dbConnect->findByOneColumn("id", $lesson['teacher_id'], "Teacher");
+            // var_dump($teachers);
+            // exit;
+            // 取得した講師情報を配列に追加する（ID、写真名前、国籍）
+            $teachers_array[] = [
+                "picture" => $teacher['picture'],
+                "nickname" => $teacher['nickname'],
+                "country" => $teacher['country'],
+                "start_time" => $lesson['start_time'],
+                "hash" => $lesson['hash']
+            ];
+        }
+        // var_dump($teachers_array);
+        // exit;
     }
 } catch (Exception $e) {
     echo $e->getMessage();
@@ -19,68 +40,40 @@ $title = "マイページ";
 require_once('header.php');
 
 ?>
+<!-- <link rel="stylesheet" href="change.css"> -->
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding-top: 80px;
-        background-color: #f4f4f4;
+    .booked-lesson {
+        margin: 10px auto;
+        width: 800px;
     }
 
     .container {
-        width: 80%;
-        margin: auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin-top: 50px;
+        border: solid 1px darkgray;
+        border-radius: 20px;
+        margin: 10px;
+        max-width: unset;
     }
 
-    h1 {
+    .booked-lesson img {
+        max-width: 90px;
+    }
+
+    .booked-lesson .row {
+        justify-content: flex-start;
+    }
+
+    .booked-lesson a {
+        color: unset;
+    }
+
+    h3 {
         text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .profile-info {
-        margin-bottom: 20px;
-        width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-
-    .profile-info p {
-        margin: 5px 0;
-    }
-
-    .profile-info p span {
-        font-weight: bold;
-    }
-
-    .row {
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #ccc;
-        padding: 10px;
-
-    }
-
-    .profile-right {
-        width: 100%;
-    }
-
-    /* 画像のスタイル */
-    .profile-picture img {
-        max-width: 200px;
-        max-height: 200px;
     }
 </style>
 
 <body>
     <?php require_once('../modal_message.php'); ?>
+    <h2><?php echo h($title) ?></h2>
     <div class="profile-info flex">
         <div class="">
             <div class="row" style="border: none;">
@@ -117,6 +110,39 @@ require_once('header.php');
                 <div class="column-right"><a href="change_pass">パスワード変更</a></div>
             </div>
         </div>
+    </div>
+    <div class="booked-lesson">
+        <h3>予約レッスン</h3>
+        <!-- ここに現在予約しているレッスンを表示する -->
+        <?php foreach ($teachers_array as $lesson) : ?>
+            <div class="container">
+                <a href="../room?lesson=<?php echo h($lesson["hash"]) ?>">
+                    <div class="flex">
+                        <div class="">
+                            <div class="row" style="border: none;">
+                                <div class="column-cente profile-picture">
+                                    <img src="../uploaded_pictures/<?php echo h($lesson["picture"]) ?>" alt="ユーザーの画像">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-right">
+                            <div class="row flex">
+                                <div class="column-left"><span>講師名:&nbsp;</span></div>
+                                <div class="column-center"><?php echo h($lesson["nickname"]) ?></div>
+                            </div>
+                            <div class="row flex">
+                                <div class="column-left"><span>国籍:&nbsp;</span></div>
+                                <div class="column-center"><?php echo h($lesson["country"]) ?></div>
+                            </div>
+                            <div class="row flex">
+                                <div class="column-left"><span>レッスン日時:&nbsp;</span></div>
+                                <div class="column-center"><?php echo h($lesson["start_time"]) ?></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <?php endforeach; ?>
     </div>
 </body>
 <?php require_once('../footer.php'); ?>

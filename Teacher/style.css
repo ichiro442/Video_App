@@ -236,3 +236,6 @@ td.fc-timegrid-slot:not(.fc-timegrid-slot-minor) {
   border-top: 2px solid var(--fc-border-color);
   ;
 }
+.text-center {
+  text-align: center;
+}

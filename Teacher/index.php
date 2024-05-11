@@ -4,36 +4,15 @@ require_once('../db_class.php');
 require_once('validation.php');
 $userData = $_SESSION['userData'];
 
-/**
- * 現在日以降の講師のスケジュールを取得する
- */
-function searchCalendar()
-{
-    $dbConnect = new dbConnect();
-    $dbConnect->initPDO();
-    $pdo = $dbConnect->getPDO();
-    $sql = "SELECT CASE available WHEN 1 THEN '○' ELSE '×' END as title";
-    $sql .= " ,(start_time - INTERVAL 60 MINUTE) as start,(start_time - INTERVAL 30 MINUTE) as end "; //フィリピンの時間に修正
-    $sql .= "from teacher_schedules where teacher_id = :id and (start_time - INTERVAL 60 MINUTE) >= DATE_FORMAT(CURRENT_DATE,'%Y-%m-%d')";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(":id", $_SESSION["userData"]["id"], PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
-
 try {
     // 初期表示の場合
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-        $dbConnect = new dbConnect();
-        $dbConnect->initPDO();
-        $pdo = $dbConnect->getPDO();
-        $sql = "SELECT CASE available WHEN 1 THEN '○' ELSE '×' END as title";
-        $sql .= " ,(start_time - INTERVAL 60 MINUTE) as start,(start_time - INTERVAL 30 MINUTE) as end "; //フィリピンの時間に修正
-        $sql .= "from teacher_schedules where teacher_id = :id and (start_time - INTERVAL 60 MINUTE) >= DATE_FORMAT(CURRENT_DATE,'%Y-%m-%d')";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(":id", $_SESSION["userData"]["id"], PDO::PARAM_INT);
-        $stmt->execute();
-        $calendar = searchCalendar();
+        // 今日以降の講師のスケジュールを取得する
+        $calendar = $dbConnect->findTeacherSchedulePhilippinesTimeByID($_SESSION["userData"]["id"]);
+        // 予約レッスンを取得
+        $booked_lesson = $dbConnect->findLessonByTeacherID($_SESSION["userData"]["id"]);
+        // 講師のスケジュールとレッスン予約を照合して、合致したら◯→✕にする
+        $calendar = $dbConnect->addBookedLesson($_SESSION["userData"]["id"], $calendar, $booked_lesson);
     }
     // 保存ボタンを押した場合
     if (!empty($_POST["submit"])) {
@@ -69,7 +48,12 @@ try {
             $stmt = $pdo->prepare($sql);
             $stmt->execute();
         }
-        $calendar = searchCalendar();
+        // 今日以降の講師のスケジュールを取得する
+        $calendar = $dbConnect->findTeacherSchedulePhilippinesTimeByID($_SESSION["userData"]["id"]);
+        // 予約レッスンを取得
+        $booked_lesson = $dbConnect->findLessonByTeacherID($_SESSION["userData"]["id"]);
+        // 講師のスケジュールとレッスン予約を照合して、合致したら◯→✕にする
+        $calendar = $dbConnect->addBookedLesson($_SESSION["userData"]["id"], $calendar, $booked_lesson);
     }
 } catch (PDOException $e) {
     echo "エラー";

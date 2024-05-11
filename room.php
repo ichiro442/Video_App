@@ -1,9 +1,43 @@
 <?php
 session_start();
-
+require_once('db_class.php');
 // 講師と生徒の情報を取得して名前を表示する
-$my_name = "いちろ";
-$partner_name = "Mary";
+if ($_GET["lesson"]) {
+  $dbConnect = new dbConnect();
+  $dbConnect->initPDO();
+  $url = $dbConnect->getURL();
+
+  // レッスンのハッシュから該当レッスンを検索し、講師と生徒の名前とIDを取得する
+  $lesson = $dbConnect->findLessonByHash($_GET["lesson"]);
+  $lesson = $lesson[0];
+
+  if (($lesson["student_id"] !== $_SESSION['userData']["id"]) &&
+    ($lesson["teacher_id"] !== $_SESSION['userData']["id"])
+  ) {
+    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][4];
+    header('Location:' . $url);
+    exit;
+  }
+  $student = $dbConnect->findByOneColumn("id", $lesson["student_id"], "Student");
+  $teacher = $dbConnect->findByOneColumn("id", $lesson["teacher_id"], "Teacher");
+  $student = $student["nickname"];
+  $teacher = $teacher["nickname"];
+}
+
+// パラメーターのlessonが空の場合、javascriptで判定されPOST送信されてここの処理に到達する
+if ($_POST) {
+  $dbConnect = new dbConnect();
+  $url = $dbConnect->getURL();
+  $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][4];
+  if ($_SESSION['userType'] == "student") {
+    header('Location:' . $url . "Student/my_page");
+    exit;
+  } else if ($_SESSION['userType'] == "teacher") {
+    header('Location:' . $url . "Teacher");
+    exit;
+  }
+}
+
 ?>
 
 <html>
@@ -59,7 +93,7 @@ $partner_name = "Mary";
       </small>
     </div>
     <!-- 退室ボタン -->
-    <div class="p-2 d-flex flex-column rounded-pill py-3 d-none d-sm-block" id="leave-button" style="width: 100px; position: absolute; right: 60px; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="window.location.href='rating.php'">
+    <div class="p-2 d-flex flex-column rounded-pill py-3 d-none d-sm-block" id="leave-button" style="width: 100px; position: absolute; right: 60px; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="window.location.href='rating'">
       <div class="row text-white justify-content-center">
         退出
       </div>

@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once('info.php');
 
 class dbConnect
@@ -82,8 +81,13 @@ class dbConnect
         unset($userData['password']);
         return $userData;
     }
+    /**
+     * =======================
+     * || 共通メソッド 検索 ||
+     * =======================
+     */
 
-    // 【共通】メールアドレスでユーザーを検索する
+    // 【共通】【検索】メールアドレスでユーザーを検索する
     public function findByMail($email, $uri)
     {
         $table = preg_match('/Teacher/', $uri) ? "teachers" : "students";
@@ -93,7 +97,39 @@ class dbConnect
         $user = $stmt->fetch();
         return $user;
     }
-    // 【共通】メールアドレスですべてのユーザーを検索する
+    // 【共通】【検索】講師IDで一週間のレッスン予約を検索する
+    public function findLessonByTeacherID($teacher_id)
+    {
+        // 今日の日付を取得
+        $today = date('Y-m-d');
+        // 1週間後の日付を計算
+        // $end_date = date('Y-m-d', strtotime('+1 week'));
+
+        $stmt = $this->pdo->prepare("SELECT * FROM lessons WHERE teacher_id = :teacher_id AND start_time >= :today");
+        // $stmt = $this->pdo->prepare("SELECT * FROM lessons WHERE teacher_id = :teacher_id AND start_time BETWEEN :today AND :end_date");
+        $stmt->bindValue(':teacher_id', $teacher_id);
+        $stmt->bindValue(':today', $today);
+        // $stmt->bindValue(':end_date', $end_date);
+        $stmt->execute();
+
+        // 検索結果を取得
+        $lessons = $stmt->fetchAll();
+        return $lessons;
+    }
+
+    // 【共通】【検索】何か１つのデータでユーザーを検索する
+    public function findByOneColumn($column, $data, $uri)
+    {
+        if ($column = "id") $data = intval($data);
+        $table = preg_match('/Teacher/', $uri) ? "teachers" : "students";
+        $stmt = $this->pdo->prepare("SELECT * FROM `$table` WHERE $column=:$column");
+        $stmt->bindValue(":$column", $data);
+        $stmt->execute();
+        $user = $stmt->fetch();
+        return $user;
+    }
+
+    // 【共通】【検索】メールアドレスですべてのユーザーを検索する
     public function findAllUsersByMail($email)
     {
         $stmt = $this->pdo->prepare("SELECT * FROM teachers WHERE email=:email UNION SELECT * FROM students WHERE email=:email");
@@ -101,6 +137,34 @@ class dbConnect
         $stmt->execute();
         $user = $stmt->fetch();
         return $user;
+    }
+
+    // 【共通】【検索】生徒or講師idでレッスンを取得する
+    public function findLessonByID($id)
+    {
+        // 今日の日付を取得
+        $today = date('Y-m-d');
+
+        $stmt = $this->pdo->prepare("SELECT * FROM lessons WHERE student_id = :student_id AND start_time >= :today");
+        $stmt->bindValue(':student_id', $id);
+        $stmt->bindValue(':today', $today);
+        $stmt->execute();
+
+        // 検索結果を取得
+        $lessons = $stmt->fetchAll();
+        return $lessons;
+    }
+
+    // 【共通】【検索】ハッシュでレッスン情報を取得する
+    public function findLessonByHash($hash)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM lessons WHERE hash = :hash");
+        $stmt->bindValue(':hash', $hash);
+        $stmt->execute();
+
+        // 検索結果を取得
+        $lessons = $stmt->fetchAll();
+        return $lessons;
     }
 
     // 【共通】ユーザーを仮登録する
@@ -133,6 +197,7 @@ class dbConnect
         $stmt->bindvalue(":id", $userId);
         return $stmt->execute();
     }
+
     // 【共通】【動的SQL】SELECT * FROM houses WHERE (AAA = :AAA OR BBB = :BBB) AND CCC = :CCC;
     // ABCをすべて満たすユーザーを取得する
     // WHERE句を生成する
@@ -275,6 +340,67 @@ class dbConnect
         return $stmt->fetchAll();
     }
 
+    // 講師のスケジュールを取得する
+    public function findTeacherScheduleByID($id)
+    {
+        $pdo = $this->getPDO();
+        $sql = "SELECT CASE available WHEN 1 THEN '○' ELSE '×' END as title";
+        $sql .= " ,start_time as start,(start_time + INTERVAL 30 MINUTE) as end ";
+        $sql .= "from teacher_schedules where teacher_id = :id and start_time >= DATE_FORMAT(CURRENT_DATE,'%Y-%m-%d')";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // 今日以降の講師のスケジュールを取得する
+    public function findTeacherSchedulePhilippinesTimeByID($id)
+    {
+        $pdo = $this->getPDO();
+        $sql = "SELECT CASE available WHEN 1 THEN '○' ELSE '×' END as title";
+        //フィリピンの時間に修正
+        $sql .= " ,(start_time - INTERVAL 60 MINUTE) as start,(start_time - INTERVAL 30 MINUTE) as end ";
+        $sql .= "from teacher_schedules where teacher_id = :id and (start_time - INTERVAL 60 MINUTE) >= DATE_FORMAT(CURRENT_DATE,'%Y-%m-%d')";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // 講師のスケジュールとレッスン予約を照合して、合致したら◯→✕にする
+    public function addBookedLesson($id, $calendar, $booked_lesson)
+    {
+        // 合致したスケジュールのインデックスを保持する配列
+        $matchedIndexes = [];
+
+        // 講師のスケジュールとレッスン予約を照合
+        foreach ($calendar as $calendarIndex => $calendarEvent) {
+            foreach ($booked_lesson as $lessonIndex => $lesson) {
+                // スケジュールの日時を日本時間から1時間引いてフィリピン時間に変換
+                $lesson['start_time'] = date('Y-m-d H:i:s', strtotime($lesson['start_time'] . ' -1 hour'));
+                // スケジュールとレッスンのstart_timeを比較
+                if ($calendarEvent['start'] === $lesson['start_time']) {
+                    // 合致した場合、スケジュールのタイトルを✕に変更する
+                    $calendar[$calendarIndex]['title'] = 'Booked';
+                    // 合致したスケジュールのインデックスを記録
+                    $matchedIndexes[] = $calendarIndex;
+                    // 一度合致したらループを抜ける
+                    break;
+                }
+            }
+        }
+
+        // カレンダーの中で合致したスケジュール以外を◯にする
+        foreach ($calendar as $index => $event) {
+            if (!in_array($index, $matchedIndexes)) {
+                $calendar[$index]['title'] = '◯';
+            }
+        }
+
+        // 修正されたカレンダーを返す
+        return $calendar;
+    }
+
     /**
      * =======================
      * || 生徒関連 ||
@@ -306,5 +432,16 @@ class dbConnect
         $stmt->bindvalue(":shash", $student["shash"]);
         $stmt->bindvalue(":id", $studentId);
         return $stmt->execute();
+    }
+
+    // 【生徒】レッスンを登録する
+    public function insertLesson($student_id, $teacher_id, $start_time, $hash)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO lessons (student_id,teacher_id,start_time,hash) VALUE (:student_id,:teacher_id,:start_time,:hash)");
+        $stmt->bindvalue(":student_id", $student_id);
+        $stmt->bindvalue(":teacher_id", $teacher_id);
+        $stmt->bindvalue(":start_time", $start_time);
+        $stmt->bindvalue(":hash", $hash);
+        return $stmt->execute();;
     }
 }

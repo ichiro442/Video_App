@@ -284,6 +284,63 @@ height: 100%;
   height: 100%;
 }
 
+/* 講師スケジュール */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th {
+  padding: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  font-weight: normal;
+}
+
+td {
+  position: relative;
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  background: #DCDCDC;
+  padding: 5px;
+}
+
+table tr:nth-child(odd) td {
+  background: #fff;
+}
+
+table td.grey {
+  background: #eee !important;
+}
+
+table td.white {
+  background: #fff;
+}
+
+th.saturday {
+  color: blue;
+}
+
+th.sunday {
+  color: red;
+}
+
+table td>a>div {
+  background: #66cdaa;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 20px;
+}
+table td>span>div {
+  background: #66cdaa;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 20px;
+  opacity: 0.4;
+}
+
 /* ------------------- */
 /* modal モーダル */
 /* ------------------- */
@@ -398,4 +455,35 @@ select {
   padding: 10px;
   width: 100%;
   border: 1px solid #ccc;
+}
+
+/* ------------------- */
+/* my_page.php マイページ */
+/* ------------------- */
+.profile-info {
+  margin-bottom: 20px;
+  width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background-color: #f9f9f9;
+}
+
+.row {
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+
+}
+
+.profile-right {
+  width: 100%;
+}
+
+/* 画像のスタイル */
+.profile-picture img {
+  max-width: 200px;
+  max-height: 200px;
 }

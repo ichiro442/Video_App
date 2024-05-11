@@ -6,7 +6,6 @@ $userData = $_SESSION['userData'];
 
 try {
     if (!empty($_POST["submit"])) { //変更ボタンが押され方どうかを確認
-        $dbConnect = new dbConnect();
         $dbConnect->initPDO();
         // ユーザーが登録しているパスワードを取得する
         $uri =  $_SERVER["REQUEST_URI"];
