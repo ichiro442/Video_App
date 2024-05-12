@@ -45,13 +45,7 @@ function updateCountdown() {
     // 残り時間（ミリ秒）を計算
     const remainingTime = 25 * 60 * 1000 - elapsedTime;
     if (remainingTime <= 0) {
-        // ページ遷移時にカウントダウンの開始時間を削除する処理
-        window.addEventListener('unload', function() {
-            localStorage.removeItem('startTime');
-        });
-        const roomId = new URLSearchParams(window.location.search).get("lesson");
-        // カウントダウンが終了したらrating.phpに遷移する
-        window.location.href = "rating?lesson="+roomId;
+        submitForm();
         return;
     }
 

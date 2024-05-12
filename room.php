@@ -1,6 +1,9 @@
 <?php
 session_start();
 require_once('db_class.php');
+require_once('definition.php');
+
+
 // 講師と生徒の情報を取得して名前を表示する
 if ($_GET["lesson"]) {
   $dbConnect = new dbConnect();
@@ -10,33 +13,57 @@ if ($_GET["lesson"]) {
   // レッスンのハッシュから該当レッスンを検索し、講師と生徒の名前とIDを取得する
   $lesson = $dbConnect->findLessonByHash($_GET["lesson"]);
   $lesson = $lesson[0];
+  $finished_flg_int = intval($lesson["finished_flg"]);
+  // レッスンが完了していたら前のページにリダイレクトする
+  if ($finished_flg_int !== 0) {
+    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][5];
+    header("Location: {$_SERVER['HTTP_REFERER']}");
+    exit;
+  }
 
+  date_default_timezone_set('Asia/Tokyo');
+  $current_time = new DateTime();
+  $start_time = new DateTime($lesson["start_time"]);
+  // 生徒はレッスン時刻よりも前には入室できない
+  if ($_SESSION['userType'] == "student" && $current_time <= $start_time) {
+    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][6];
+    header("Location: {$_SERVER['HTTP_REFERER']}");
+    exit;
+  }
+
+  // ユーザーと予約しているユーザーが違った場合、前のページにリダイレクト
   if (($lesson["student_id"] !== $_SESSION['userData']["id"]) &&
     ($lesson["teacher_id"] !== $_SESSION['userData']["id"])
   ) {
     $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][4];
-    header('Location:' . $url);
+    header("Location: {$_SERVER['HTTP_REFERER']}");
     exit;
   }
   $student = $dbConnect->findByOneColumn("id", $lesson["student_id"], "Student");
   $teacher = $dbConnect->findByOneColumn("id", $lesson["teacher_id"], "Teacher");
+
+  // 生徒と講師の名前
   $student = $student["nickname"];
   $teacher = $teacher["nickname"];
+} else {
+  // パラメーターのlessonが空の場合、前のページへリダイレクト
+  $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][4];
+  header("Location: {$_SERVER['HTTP_REFERER']}");
+  exit;
 }
 
-// パラメーターのlessonが空の場合、javascriptで判定されPOST送信されてここの処理に到達する
+// レッスンが完了した場合
 if ($_POST) {
-  $dbConnect = new dbConnect();
-  $url = $dbConnect->getURL();
-  $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][4];
-  if ($_SESSION['userType'] == "student") {
-    header('Location:' . $url . "Student/my_page");
-    exit;
-  } else if ($_SESSION['userType'] == "teacher") {
-    header('Location:' . $url . "Teacher");
-    exit;
-  }
+  // $dbConnect = new dbConnect();
+  // $dbConnect->initPDO();
+  // $url = $dbConnect->getURL();
+  // $finished_flg = 1;
+  // $dbConnect->updateLesson($_GET["lesson"],  "finished_flg", $finished_flg);
+
+  header('Location:' . $url . "rating?lesson=" . $_GET["lesson"]);
+  exit;
 }
+
 
 ?>
 
@@ -54,7 +81,7 @@ if ($_POST) {
 <body class="bg-dark">
   <div id="header" class="bg-dark w-100 d-block d-sm-none" style="position: absolute; top: 0; z-index: 10;" hidden>
     <!-- 退室ボタン(スマホ用) -->
-    <div class="p-2 d-flex flex-column rounded-pill py-3 m-3" id="leave-button" style="width: 100px; position: absolute; right: 0; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="window.location.href='join.html'">
+    <div class="p-2 d-flex flex-column rounded-pill py-3 m-3" id="leave-button" style="width: 100px; position: absolute; right: 0; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="submitForm()">
       <div class="row text-white justify-content-center">
         退出
       </div>
@@ -93,16 +120,34 @@ if ($_POST) {
       </small>
     </div>
     <!-- 退室ボタン -->
-    <div class="p-2 d-flex flex-column rounded-pill py-3 d-none d-sm-block" id="leave-button" style="width: 100px; position: absolute; right: 60px; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="window.location.href='rating'">
+    <div class="p-2 d-flex flex-column rounded-pill py-3 d-none d-sm-block" id="leave-button" style="width: 100px; position: absolute; right: 60px; background-color: #d82919; cursor: pointer;" onmouseover="this.style.background='#e83929'" onmouseout="this.style.background='#d82919'" onclick="submitForm()">
       <div class="row text-white justify-content-center">
         退出
       </div>
     </div>
   </div>
+  <form method="POST" id="hidden-form">
+    <input type="hidden" name="lesson" value="lesson_value">
+  </form>
+  <script>
+    function submitForm() {
+      // ページ遷移時にカウントダウンの開始時間を削除する処理
+      window.addEventListener('unload', function() {
+        localStorage.removeItem('startTime');
+      });
+
+      // フォームを取得
+      var form = document.getElementById('hidden-form');
+
+      // フォームを送信
+      form.submit();
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.js"></script>
   <script src="config.js"></script>
   <script src="main.js"></script>
   <script src="countdown.js"></script>
 </body>
+<?php require_once('footer.php'); ?>
 
 </html>

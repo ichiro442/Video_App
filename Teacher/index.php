@@ -126,6 +126,7 @@ require_once('header.php');
             <div class="row flex">
                 <div class="column-left"><span>レッスン数:</span></div>
                 <div class="column-center">100</div>
+                <div class="column-right"><a href="lesson_detail">レッスン詳細</a></div>
             </div>
             <div class="row flex">
                 <div class="column-left"><span>トータル収入:</span></div>

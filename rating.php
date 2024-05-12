@@ -1,14 +1,46 @@
 <?php
 session_start();
 require_once('db_class.php');
+require_once('definition.php');
 
-if ($_POST["rating"]) {
+if ($_GET["lesson"]) {
   $dbConnect = new dbConnect();
+  $dbConnect->initPDO();
   $url = $dbConnect->getURL();
-  // レッスンをした講師と生徒のIDを取得する
-  // uriを取得して講師か生徒かを判断する
-  // 評価を登録する
-  // 講師と生徒のそれぞれのindexの画面にリダイレクトする
+
+  // レッスンのハッシュから該当レッスンを検索し、講師と生徒の名前とIDを取得する
+  $lesson = $dbConnect->findLessonByHash($_GET["lesson"]);
+  $lesson = $lesson[0];
+  $finished_flg_int = intval($lesson["finished_flg"]);
+
+  // レッスンが完了していない場合、前のページにリダイレクトする
+  if ($finished_flg_int == 0) {
+    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][7];
+    header("Location: {$_SERVER['HTTP_REFERER']}");
+    exit;
+  }
+  $student = $dbConnect->findByOneColumn("id", $lesson["student_id"], "Student");
+  $teacher = $dbConnect->findByOneColumn("id", $lesson["teacher_id"], "Teacher");
+}
+if ($_POST) {
+  if ($student["id"] == $_SESSION["userData"]["id"]) {
+    // 生徒→講師の評価を登録する
+    $rating_target = "teacher";
+    $dbConnect->insertRating($lesson["id"], $student["id"], $teacher["id"], $rating_target, $_POST["rating"], $_POST["comment"]);
+    // 生徒のそれぞれのindexの画面にリダイレクトする
+    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][8];
+    header('Location:' . $url . "Student");
+    exit;
+  } elseif ($teacher["id"] == $_SESSION["userData"]["id"]) {
+    // 講師→生徒の評価を登録する
+    $rating_target = "student";
+    $dbConnect->insertRating($lesson["id"], $student["id"], $teacher["id"], $rating_target, $_POST["rating"], $_POST["comment"]);
+    // 生徒のそれぞれのindexの画面にリダイレクトする
+    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][8];
+    header('Location:' . $url . "Teacher");
+    exit;
+  }
+
   $_SESSION["flash_message"] = "評価が " . $_POST["rating"] . " / 5 で送信されました。";
   header("Location: " . $url . "Student");
   exit;
@@ -47,42 +79,55 @@ require_once('header.php');
       <label for="">コメント</label>
     </div>
     <div class="rating-description">
-      <textarea name="comment" id="" cols="60" rows="7"></textarea>
+      <textarea name="comment" id="ratingComment" cols="60" rows="7"></textarea>
     </div>
     <button class="submit-button" onclick="submitRating()">送信する</button>
     <form id="ratingForm" method="POST">
       <input type="hidden" name="rating" id="ratingInput">
+      <input type="hidden" name="comment" id="commentInput">
     </form>
   </div>
 
   <script>
+    // 星の要素を取得
     const stars = document.querySelectorAll(".star");
+    // 評価値を表示する要素を取得
     const ratingValue = document.getElementById("ratingValue");
 
+    // 各星にクリックイベントを追加
     stars.forEach((star) => {
       star.addEventListener("click", () => {
+        // クリックされた星の評価値を取得してセットする
         const value = parseInt(star.getAttribute("data-value"));
         setRating(value);
       });
     });
 
+    // 評価値を設定する関数
     function setRating(value) {
       stars.forEach((star) => {
+        // 各星の評価値を取得
         const starValue = parseInt(star.getAttribute("data-value"));
+        // クリックされた星よりも小さい評価値の星はチェック済みにする
         if (starValue <= value) {
           star.classList.add("checked");
         } else {
           star.classList.remove("checked");
         }
       });
+      // ページ上に評価値を表示する
       ratingValue.textContent = value;
     }
 
+    // 評価を送信する関数
     function submitRating() {
+      // 現在の評価値を取得
       const rating = parseInt(ratingValue.textContent);
+      const comment = document.getElementById('ratingComment').value;
 
-      // PHPのinput要素のvalueに評価の値を設定する
+      // 評価値をPHPのinput要素のvalueに設定する
       document.getElementById('ratingInput').value = rating;
+      document.getElementById('commentInput').value = comment;
 
       // ページをリロードせずにフォームを送信する
       document.getElementById('ratingForm').submit();

@@ -14,6 +14,7 @@ try {
         $column = "nickname";
         $uri =  $_SERVER["REQUEST_URI"];
         $result = $dbConnect->updateOneColumn($userData["id"], $userData["nickname"], $column, $uri);
+
         // 更新結果を確認する
         if (!$result) {
             $_SESSION['flash_message'] =  FLASH_MESSAGE[3];

@@ -140,13 +140,15 @@ class dbConnect
     }
 
     // 【共通】【検索】生徒or講師idでレッスンを取得する
-    public function findLessonByID($id)
+    public function findLessonByID($id, $uri)
     {
+        $serch_id = preg_match('/Teacher/', $uri) ? "teacher_id" : "student_id";
+
         // 今日の日付を取得
         $today = date('Y-m-d');
 
-        $stmt = $this->pdo->prepare("SELECT * FROM lessons WHERE student_id = :student_id AND start_time >= :today");
-        $stmt->bindValue(':student_id', $id);
+        $stmt = $this->pdo->prepare("SELECT * FROM lessons WHERE $serch_id = :serch_id AND start_time >= :today AND finished_flg =0 ORDER BY start_time ASC");
+        $stmt->bindValue(':serch_id', $id);
         $stmt->bindValue(':today', $today);
         $stmt->execute();
 
@@ -166,8 +168,13 @@ class dbConnect
         $lessons = $stmt->fetchAll();
         return $lessons;
     }
+    /**
+     * =======================
+     * || 共通メソッド 登録 ||
+     * =======================
+     */
 
-    // 【共通】ユーザーを仮登録する
+    // 【共通】【登録】ユーザーを仮登録する
     public function insertUser($first_name, $last_name, $nickname, $email, $country, $password, $table)
     {
         $stmt = $this->pdo->prepare("INSERT INTO `$table`(first_name,last_name,nickname,email,country,password,shash) VALUE (:first_name,:last_name,:nickname,:email,:country,:password,:shash)");
@@ -185,16 +192,46 @@ class dbConnect
         $stmt->execute();
         return $shash;
     }
-
-    // 【共通】一つのデータを更新
-    public function updateOneColumn($userId, $value, $column, $table)
+    // 【共通】【登録】生徒→講師or講師→生徒の評価を登録する
+    public function insertRating($lesson_id, $student_id, $teacher_id, $rating_target, $rating_value, $comment)
     {
+        $stmt = $this->pdo->prepare("INSERT INTO ratings (lesson_id,student_id,teacher_id,rating_target,rating_value,comment) VALUE (:lesson_id,:student_id,:teacher_id,:rating_target,:rating_value,:comment)");
+        $stmt->bindvalue(":lesson_id", $lesson_id, PDO::PARAM_INT);
+        $stmt->bindvalue(":student_id", $student_id, PDO::PARAM_INT);
+        $stmt->bindvalue(":teacher_id", $teacher_id, PDO::PARAM_INT);
+        $stmt->bindvalue(":rating_target", $rating_target, PDO::PARAM_STR);
+        $stmt->bindvalue(":rating_value", $rating_value, PDO::PARAM_INT);
+        $stmt->bindvalue(":comment", $comment, PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+    /**
+     * =======================
+     * || 共通メソッド 更新 ||
+     * =======================
+     */
+
+    // 【共通】【更新】講師か生徒の一つのデータを更新
+    public function updateOneColumn($userId, $value, $column, $uri)
+    {
+        $table = preg_match('/Teacher/', $uri) ? "teachers" : "students";
         $query = "update `$table` set";
         $query .= " `$column`=:value";
         $query .= " WHERE id=:id";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindvalue(":value", $value);
         $stmt->bindvalue(":id", $userId);
+        return $stmt->execute();
+    }
+
+    // 【共通】【更新】レッスンの一つのデータを更新
+    public function updateLesson($hash, $column, $value)
+    {
+        $query = "update lessons set";
+        $query .= " `$column`=:value";
+        $query .= " WHERE hash=:hash";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindvalue(":value", $value);
+        $stmt->bindvalue(":hash", $hash);
         return $stmt->execute();
     }
 
