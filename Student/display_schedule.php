@@ -55,7 +55,6 @@
             const date = new Date();
             // PHPで取得した$lessons_weekをJavaScriptに渡す
             var lessonsWeek = <?php echo json_encode($lessons_week); ?>;
-            console.log(lessonsWeek);
             for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
                 const year = date.getFullYear();
                 const month = ("0" + String(date.getMonth() + 1)).slice(-2);
@@ -72,12 +71,14 @@
                     // すでに予約されている時間帯は✕を表示する
                     for (let i = 0; i < lessonsWeek.length; i++) {
                         var lesson = lessonsWeek[i];
+
                         if (lesson.start_time === strDate) {
                             div.textContent = "✕";
                             const link = document.createElement('span');
                             link.appendChild(div);
                             cell.appendChild(link);
                             hasBookedLesson = true; // 予約があることを示すフラグを設定
+                            cell.className = "white";
                         }
                     }
 

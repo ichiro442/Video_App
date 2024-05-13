@@ -25,11 +25,11 @@ if ($_GET["lesson"]) {
   $current_time = new DateTime();
   $start_time = new DateTime($lesson["start_time"]);
   // 生徒はレッスン時刻よりも前には入室できない
-  if ($_SESSION['userType'] == "student" && $current_time <= $start_time) {
-    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][6];
-    header("Location: {$_SERVER['HTTP_REFERER']}");
-    exit;
-  }
+  // if ($_SESSION['userType'] == "student" && $current_time <= $start_time) {
+  //   $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][6];
+  //   header("Location: {$_SERVER['HTTP_REFERER']}");
+  //   exit;
+  // }
 
   // ユーザーと予約しているユーザーが違った場合、前のページにリダイレクト
   if (($lesson["student_id"] !== $_SESSION['userData']["id"]) &&

@@ -14,11 +14,11 @@ if ($_GET["lesson"]) {
   $finished_flg_int = intval($lesson["finished_flg"]);
 
   // レッスンが完了していない場合、前のページにリダイレクトする
-  if ($finished_flg_int == 0) {
-    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][7];
-    header("Location: {$_SERVER['HTTP_REFERER']}");
-    exit;
-  }
+  // if ($finished_flg_int == 0) {
+  //   $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][7];
+  //   header("Location: {$_SERVER['HTTP_REFERER']}");
+  //   exit;
+  // }
   $student = $dbConnect->findByOneColumn("id", $lesson["student_id"], "Student");
   $teacher = $dbConnect->findByOneColumn("id", $lesson["teacher_id"], "Teacher");
 }
@@ -27,6 +27,10 @@ if ($_POST) {
     // 生徒→講師の評価を登録する
     $rating_target = "teacher";
     $dbConnect->insertRating($lesson["id"], $student["id"], $teacher["id"], $rating_target, $_POST["rating"], $_POST["comment"]);
+
+    $finished_flg = LESSON["finished_flg"];
+    $dbConnect->updateLesson($_GET["lesson"], "finished_flg", $finished_flg);
+
     // 生徒のそれぞれのindexの画面にリダイレクトする
     $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][8];
     header('Location:' . $url . "Student");
@@ -35,6 +39,9 @@ if ($_POST) {
     // 講師→生徒の評価を登録する
     $rating_target = "student";
     $dbConnect->insertRating($lesson["id"], $student["id"], $teacher["id"], $rating_target, $_POST["rating"], $_POST["comment"]);
+    $finished_flg = LESSON["finished_flg"];
+    $Connect->updateLesson($_GET["lesson"], "finished_flg", $finished_flg);
+
     // 生徒のそれぞれのindexの画面にリダイレクトする
     $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][8];
     header('Location:' . $url . "Teacher");

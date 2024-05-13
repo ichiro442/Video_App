@@ -380,12 +380,16 @@ class dbConnect
     // 講師のスケジュールを取得する
     public function findTeacherScheduleByID($id)
     {
+        date_default_timezone_set('Asia/Tokyo');
+        $current_date_time = date('Y-m-d H:i');
+
         $pdo = $this->getPDO();
         $sql = "SELECT CASE available WHEN 1 THEN '○' ELSE '×' END as title";
         $sql .= " ,start_time as start,(start_time + INTERVAL 30 MINUTE) as end ";
-        $sql .= "from teacher_schedules where teacher_id = :id and start_time >= DATE_FORMAT(CURRENT_DATE,'%Y-%m-%d')";
+        $sql .= "from teacher_schedules where teacher_id = :id and start_time >= :current_date_time";
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->bindValue(":current_date_time", $current_date_time);
         $stmt->execute();
         return $stmt->fetchAll();
     }

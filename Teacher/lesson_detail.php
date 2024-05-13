@@ -15,25 +15,35 @@ try {
     // 取得したレッスンの数を数える
     $lesson_count = count($lessons);
 
-    // var_dump($lesson_count);
-    // // var_dump($lessons);
-    // exit;
-    if (!empty($_POST["submit"])) {
+    date_default_timezone_set('Asia/Tokyo');
+    // 予約されたすべてのレッスンに対して処理を行う
+    foreach ($lessons as $key => $lesson) {
+        // 生徒IDを使って講師の情報を取得する
+        $student = $dbConnect->findByOneColumn("id", $lesson['student_id'], "Student");
 
-        $userData["nickname"] = $_POST["nickname"];
-        $column = "nickname";
-        $uri =  $_SERVER["REQUEST_URI"];
-        $result = $dbConnect->updateOneColumn($userData["id"], $userData["nickname"], $column, $uri);
-        // 更新結果を確認する
-        if (!$result) {
-            $_SESSION['flash_message'] =  FLASH_MESSAGE[3];
-            unset($_POST);
-        } else {
-            $_SESSION['flash_message'] = FLASH_MESSAGE[4];
-            $_SESSION['userData']["nickname"] = $_POST["nickname"];
-            $url = $dbConnect->getURL();
-            header('Location:' . $url . "Teacher");
-            exit;
+        // レッスンが終了していない場合、取得した講師情報を配列に追加する
+        $finished_flg_int = intval($lesson["finished_flg"]);
+
+        $current_time = new DateTime();
+        $start_time = new DateTime($lesson["start_time"]);
+
+        // 定数からキャンセル時間を取得する
+        $cancel_time = LESSON["cancel_time"];
+        $cancel_time = $start_time->modify("+$cancel_time minutes");
+        $students_array = [];
+        if ($finished_flg_int !== 1 && ($current_time <= $cancel_time)) {
+            $students_array[] = [
+                "picture" => $student['picture'],
+                "nickname" => $student['nickname'],
+                "country" => $student['country'],
+                "start_time" => $lesson['start_time'],
+                "hash" => $lesson['hash'],
+                "finished_flg" => $lesson['finished_flg']
+            ];
+        } elseif ($finished_flg_int == 0 && ($current_time > $cancel_time)) {
+            // 未完了のレッスンがレッスン開始時刻からLESSON["cancel_time"]分過ぎた場合、キャンセルする
+            $finished_flg_cancel = LESSON["finished_flg_cancel"];
+            $dbConnect->updateLesson($lesson['hash'], "finished_flg", $finished_flg_cancel);
         }
     }
 } catch (PDOException $e) {
@@ -55,7 +65,7 @@ require_once('header.php');
         <span>未完了のレッスン数:&nbsp;<?php echo h($lesson_count) ?> </span>
     </div>
     <!-- ここに現在予約しているレッスンを表示する -->
-    <?php foreach ($lessons as $lesson) : ?>
+    <?php foreach ($students_array as $lesson) : ?>
         <div class="container">
             <a href="../room?lesson=<?php echo h($lesson["hash"]) ?>">
                 <div class="flex">
