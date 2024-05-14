@@ -20,13 +20,12 @@ try {
     $dbConnect->initPDO();
     $teacher = $dbConnect->findByOneColumn("id", $_GET["id"], "Teacher");
 
-    // // 現在日時よりも未来の講師スケジュールだけを取り出す
+    // 現在日時よりも未来の講師スケジュールだけを取り出す
     $calendar = $dbConnect->findTeacherScheduleByID($_GET["id"]);
 
     // 今日から１週間分の講師のレッスン予約を取得する
     $lessons_week = $dbConnect->findLessonByTeacherID($_GET["id"]);
-    // var_dump($lessons_week);
-    // exit;
+
     // 現在時刻日本時間を取得する
     date_default_timezone_set('Asia/Tokyo');
 

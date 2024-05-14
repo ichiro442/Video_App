@@ -377,7 +377,7 @@ class dbConnect
         return $stmt->fetchAll();
     }
 
-    // 講師のスケジュールを取得する
+    // 現在日時よりも未来の講師スケジュールだけを取得する（日本時間）
     public function findTeacherScheduleByID($id)
     {
         date_default_timezone_set('Asia/Tokyo');
@@ -394,7 +394,7 @@ class dbConnect
         return $stmt->fetchAll();
     }
 
-    // 今日以降の講師のスケジュールを取得する
+    // 今日以降の講師のスケジュールを取得する（フィリピン時間）
     public function findTeacherSchedulePhilippinesTimeByID($id)
     {
         $pdo = $this->getPDO();

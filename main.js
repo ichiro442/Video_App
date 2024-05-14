@@ -199,12 +199,52 @@ const token = new SkyWayAuthToken({
     name: roomId,
   });
 
-  // アプリ仕様上、Roomの最大参加人数を2名に制限する
-  if (room.members.length >= maxNumberParticipants) {
-    alert('最大参加人数(' + maxNumberParticipants + ')を超えています');
-    room.dispose();
-    return;
-  }
+// 空のオブジェクトを用意
+let participants = {};
+
+// 参加者が入室した時の処理
+function onParticipantJoined(participantId) {
+    // 参加者をオブジェクトに追加
+    participants[participantId] = true;
+    // 参加者数を出力
+    console.log("参加者数:", Object.keys(participants).length);
+}
+
+// 参加者が退出した時の処理
+function onParticipantLeft(participantId) {
+    // 参加者をオブジェクトから削除
+    delete participants[participantId];
+    // 参加者数を出力
+    console.log("参加者数:", Object.keys(participants).length);
+}
+
+// SkyWayのイベントハンドラに参加者が入室したときに実行する
+room.onMemberJoined.add((event) => {
+  // 入室した参加者のIDを取得
+  const participantId = event.member.id;
+  console.log(event.member.id + " が入室しました")
+  onParticipantJoined(participantId);
+});
+
+// 参加者が退出したときに実行する
+room.onMemberLeft.add((event) => {
+  // 退室した参加者のIDを取得
+  const participantId = event.member.id; // event.member.id を参照する
+  onParticipantLeft(participantId); // onParticipantLeft 関数に参加者のIDを渡す
+  console.log(participantId + " が退室しました");
+});
+
+// アプリ仕様上、Roomの最大参加人数を2名に制限する
+if (Object.keys(participants).length >= maxNumberParticipants) {
+  alert('最大参加人数(' + maxNumberParticipants + ')を超えています');
+  room.dispose();
+  return;
+}
+
+// 参加者の人数が2人になったらカウントダウンを開始する
+if (Object.keys(participants).length === 2) {
+
+}
 
   // STEP4: Roomに参加
   let me = await room.join();

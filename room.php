@@ -13,6 +13,7 @@ if ($_GET["lesson"]) {
   // レッスンのハッシュから該当レッスンを検索し、講師と生徒の名前とIDを取得する
   $lesson = $dbConnect->findLessonByHash($_GET["lesson"]);
   $lesson = $lesson[0];
+
   $finished_flg_int = intval($lesson["finished_flg"]);
   // レッスンが完了していたら前のページにリダイレクトする
   if ($finished_flg_int !== 0) {
@@ -76,7 +77,19 @@ if ($_POST) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </head>
+<style>
+  /* #countdown {
+    font-size: 2em;
+    text-align: center;
+    margin: 20px;
+  }
+
+  span {
+    margin: 0 10px;
+  } */
+</style>
 
 <body class="bg-dark">
   <div id="header" class="bg-dark w-100 d-block d-sm-none" style="position: absolute; top: 0; z-index: 10;" hidden>
@@ -90,6 +103,14 @@ if ($_POST) {
 
   <!-- カウントダウン -->
   <div id="countdown" class="countdown"></div>
+
+  <!-- カウントダウン 2パターン目 -->
+  <!-- <div id="countdown">
+    <span id="days"></span>
+    <span id="hours"></span>
+    <span id="minutes"></span>
+    <span id="seconds"></span>
+  </div> -->
 
   <!-- 自分のカメラ映像とマイク -->
   <img id="local-video" src="Img/0.png"></img>
@@ -130,6 +151,8 @@ if ($_POST) {
     <input type="hidden" name="lesson" value="lesson_value">
   </form>
   <script>
+    const start_time = <?php echo json_encode($lesson["start_time"]); ?>;
+
     function submitForm() {
       // ページ遷移時にカウントダウンの開始時間を削除する処理
       window.addEventListener('unload', function() {
@@ -148,6 +171,7 @@ if ($_POST) {
   <script src="main.js"></script>
   <script src="countdown.js"></script>
 </body>
+<!-- <?php require_once('countdown2.php'); ?> -->
 <?php require_once('footer.php'); ?>
 
 </html>
