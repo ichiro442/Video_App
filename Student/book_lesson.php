@@ -20,12 +20,12 @@ try {
         $dbConnect->initPDO();
 
         // レッスンテーブルにデータを格納する
-        // ハッシュの生成が必要？
         $student_id = $_SESSION['userData']["id"];
         $teaher_id = $_GET["t_id"];
         $start_time = $_GET["strDate"];
         $current_time = new DateTime();
         $current_time = $current_time->format("Y-m-d H:i:s");
+        // ハッシュの生成
         $hash = substr(md5($student_id . $teaher_id . $current_time), 0, 20);
         $result = $dbConnect->insertLesson($student_id, $teaher_id, $start_time, $hash);
 

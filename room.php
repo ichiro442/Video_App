@@ -22,9 +22,6 @@ if ($_GET["lesson"]) {
     exit;
   }
 
-  date_default_timezone_set('Asia/Tokyo');
-  $current_time = new DateTime();
-  $start_time = new DateTime($lesson["start_time"]);
   // 生徒はレッスン時刻よりも前には入室できない
   // if ($_SESSION['userType'] == "student" && $current_time <= $start_time) {
   //   $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][6];
@@ -46,6 +43,20 @@ if ($_GET["lesson"]) {
   // 生徒と講師の名前
   $student = $student["nickname"];
   $teacher = $teacher["nickname"];
+
+  // 25分を加算してend_timeを計算
+  // $end_time = clone $start_time;
+  // $end_time->add(new DateInterval('PT25M'));
+  date_default_timezone_set('Asia/Tokyo');
+
+  $start_time = new DateTime($lesson["start_time"]);
+  $start_time->add(new DateInterval('PT25M'));
+  $end_time = $start_time->format('Y-m-d H:i:s');
+  // var_dump($end_time);
+  // exit;
+  // end_timeをHH:MM形式の文字列に変換（秒も含む）
+  // var_dump($end_time_string);
+  // exit;
 } else {
   // パラメーターのlessonが空の場合、前のページへリダイレクト
   $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][4];
@@ -80,15 +91,16 @@ if ($_POST) {
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </head>
 <style>
-  /* #countdown {
+  #countdown {
     font-size: 2em;
     text-align: center;
     margin: 20px;
+    color: white;
   }
 
   span {
     margin: 0 10px;
-  } */
+  }
 </style>
 
 <body class="bg-dark">
@@ -109,8 +121,8 @@ if ($_POST) {
     <span id="days"></span>
     <span id="hours"></span>
     <span id="minutes"></span>
-    <span id="seconds"></span>
-  </div> -->
+    <span id="seconds"></span> -->
+  </div>
 
   <!-- 自分のカメラ映像とマイク -->
   <img id="local-video" src="Img/0.png"></img>
@@ -151,7 +163,7 @@ if ($_POST) {
     <input type="hidden" name="lesson" value="lesson_value">
   </form>
   <script>
-    const start_time = <?php echo json_encode($lesson["start_time"]); ?>;
+    // const end_time = new Date(<?php echo json_encode($end_time_string) ?>);
 
     function submitForm() {
       // ページ遷移時にカウントダウンの開始時間を削除する処理
@@ -169,7 +181,76 @@ if ($_POST) {
   <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.js"></script>
   <script src="config.js"></script>
   <script src="main.js"></script>
-  <script src="countdown.js"></script>
+  <!-- <script src="countdown.js"></script> -->
+  <script>
+    $(document).ready(function() {
+      // カウントダウンの終了日時を設定
+      // let countdownDate = new Date("2024-12-12T00:00:00");
+      // console.log("レッスン開始時間" + start_time);
+      const end_time = new Date(<?php echo json_encode($end_time) ?>);
+      // let end_time2 = new Date(end_time).toLocaleString('ja-JP', {
+      //   timeZone: 'Asia/Tokyo'
+      // });
+
+      // debugger;
+      let x = setInterval(function() {
+
+        // 現在の日時を取得
+        let now = new Date().toLocaleString('ja-JP', {
+          timeZone: 'Asia/Tokyo'
+        });
+        console.log("現在時刻: " + now);
+        console.log("終了時刻: " + end_time);
+
+        // 残り時間を計算（ミリ秒）
+        var remainingTime = end_time - now;
+        console.log("残り: " + remainingTime);
+
+        // 残り時間を分と秒に変換
+        var minutes = Math.floor(remainingTime / (1000 * 60));
+        var seconds = Math.floor((remainingTime / 1000) % 60);
+
+        console.log("残り時間: " + minutes + "分 " + seconds + "秒");
+
+        remainingTime = minutes + ":" + seconds;
+        // カウントダウンまでの残り時間を計算
+        // let distance = countdownDate - now;
+        // console.log("カウントダウンまでの残り時間* " + distance);
+        // // debugger;
+        // // 残り時間を日数、時間、分、秒に変換
+        // let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        // let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        // let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        // let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        // console.log("days: " + days);
+        // console.log("hours: " + hours);
+        // console.log("minutes: " + minutes);
+        // console.log("seconds: " + seconds);
+        // var time = minutes + ":" + seconds;
+
+        // カウントダウンが終了した場合はメッセージを表示してタイマーを停止
+        if (remainingTime < 0) {
+          clearInterval(x);
+          $("#countdown").html("<span>カウントダウン終了</span>");
+        } else {
+          // 残り時間を表示
+          $("#countdown").text(remainingTime);
+        }
+        // // カウントダウンが終了した場合はメッセージを表示してタイマーを停止
+        // if (distance < 0) {
+        //   clearInterval(x);
+        //   $("#countdown").html("<span>カウントダウン終了</span>");
+        // } else {
+        //   // 残り時間を表示
+        //   $("#countdown").text(time);
+        //   $("#days").text(days + "日");
+        //   $("#hours").text(hours + "時間");
+        //   $("#minutes").text(minutes + "分");
+        //   $("#seconds").text(seconds + "秒");
+        // }
+      }, 1000); // 1000ミリ秒ごとに更新
+    });
+  </script>
 </body>
 <!-- <?php require_once('countdown2.php'); ?> -->
 <?php require_once('footer.php'); ?>
