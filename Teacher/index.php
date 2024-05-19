@@ -66,8 +66,8 @@ require_once('header.php');
 ?>
 <link rel="stylesheet" href="change.css">
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10" async></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js" defer></script>
 <style>
     #calendar {
         width: 50%;

@@ -4,7 +4,7 @@ function h($s)
     return htmlspecialchars($s, ENT_QUOTES, "UTF-8");
 }
 
-if ($_GET["u"] !== "un") {
+if (isset($_GET['u']) && $_GET["u"] !== "un") {
     $path = "/video_app/Student";
 } else {
     $path = "/video_app";

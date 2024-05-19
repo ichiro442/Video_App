@@ -14,6 +14,7 @@ try {
         $lessons = $dbConnect->findLessonByID($_SESSION["userData"]["id"], $uri);
 
         date_default_timezone_set('Asia/Tokyo');
+        $teachers_array = [];
         // 予約されたすべてのレッスンに対して処理を行う
         foreach ($lessons as $key => $lesson) {
             // 講師IDを使って講師の情報を取得する
@@ -28,7 +29,6 @@ try {
             // 定数からキャンセル時間を取得する
             $cancel_time = LESSON["cancel_time"];
             $cancel_time = $start_time->modify("+$cancel_time minutes");
-            $teachers_array = [];
             if ($finished_flg_int !== 1 && ($current_time <= $cancel_time)) {
                 $teachers_array[] = [
                     "picture" => $teacher['picture'],

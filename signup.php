@@ -12,12 +12,24 @@ try {
     $_SESSION['flash_message'] = FLASH_MESSAGE[14];
     header("Location: " . $url);
   }
+
+  // 初期値
+  $first_name = "";
+  $last_name = "";
+  $nickname = "";
+  $email = "";
+  $country = "";
+
   // 登録ボタンが押された時の処理
   if (!empty($_POST["submit"])) {
     $dbConnect->initPDO();
     $userData = $_POST;
     $url = $dbConnect->getURL();
     $_SESSION['userData'] = $userData;
+    $first_name = $_POST["fist_name"];
+    $last_name = $_POST["last_name"];
+    $nickname = $_POST["nickname"];
+    $email = $_POST["email"];
 
     // パスワードの一致を確認する
     $password = 0;
@@ -77,15 +89,15 @@ require_once('header.php');
     <form method="post">
       <div class="form-group">
         <label for="last_name">名字</label>
-        <input type="text" name="last_name" value="<?php echo h($_POST["last_name"]) ?>" required />
+        <input type="text" name="last_name" value="<?php echo h($last_name) ?>" required />
       </div>
       <div class="form-group">
         <label for="first_name">名前</label>
-        <input type="text" name="first_name" value="<?php echo h($_POST["first_name"]) ?>" required />
+        <input type="text" name="first_name" value="<?php echo h($first_name) ?>" required />
       </div>
       <div class="form-group">
         <label for="nickname">ニックネーム</label>
-        <input type="text" name="nickname" value="<?php echo h($_POST["nickname"]) ?>" required />
+        <input type="text" name="nickname" value="<?php echo h($nickname) ?>" required />
       </div>
       <div class="form-group">
         <label for="nickname">国籍</label>
@@ -100,7 +112,7 @@ require_once('header.php');
       </div>
       <div class="form-group">
         <label for="email">メールアドレス</label>
-        <input type="email" name="email" value="<?php echo h($_POST["email"]) ?>" required />
+        <input type="email" name="email" value="<?php echo h($email) ?>" required />
       </div>
       <div class="form-group">
         <label for="password">パスワード</label>
