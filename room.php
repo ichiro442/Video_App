@@ -195,9 +195,9 @@ if ($_POST) {
 
     function submitForm() {
       // ページ遷移時にカウントダウンの開始時間を削除する処理
-      window.addEventListener('unload', function() {
-        localStorage.removeItem('startTime');
-      });
+      // window.addEventListener('unload', function() {
+      //   localStorage.removeItem('startTime');
+      // });
 
       // フォームを取得
       var form = document.getElementById('hidden-form');

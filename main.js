@@ -222,7 +222,7 @@ function onParticipantLeft(participantId) {
 room.onMemberJoined.add((event) => {
   // 入室した参加者のIDを取得
   const participantId = event.member.id;
-  console.log(event.member.id + " が入室しました")
+  console.log(event.member.id + " が入室しました");
   onParticipantJoined(participantId);
 });
 
@@ -242,8 +242,13 @@ if (Object.keys(participants).length >= maxNumberParticipants) {
 }
 
 // 参加者の人数が2人になったらカウントダウンを開始する
-if (Object.keys(participants).length === 2) {
+if (Object.keys(participants).length == 2) {
+  console.log("ここに入った");
+    //   // 1秒ごとにカウントダウンを更新
+    //   var intervalId = setInterval(updateCountdown, 1000);
 
+    // // 初回表示を即座に更新
+    // updateCountdown();
 }
 
   // STEP4: Roomに参加
