@@ -41,8 +41,8 @@ if ($_GET["lesson"]) {
   $teacher = $dbConnect->findByOneColumn("id", $lesson["teacher_id"], "Teacher");
 
   // 生徒と講師の名前
-  $student = $student["nickname"];
-  $teacher = $teacher["nickname"];
+  // $student = $student["nickname"];
+  // $teacher = $teacher["nickname"];
 
   // 25分を加算してend_timeを計算
   date_default_timezone_set('Asia/Tokyo');
@@ -58,17 +58,20 @@ if ($_GET["lesson"]) {
 
 // レッスンが完了した場合
 if ($_POST) {
-  // $dbConnect = new dbConnect();
-  // $dbConnect->initPDO();
-  // $url = $dbConnect->getURL();
-  // $finished_flg = 1;
-  // $dbConnect->updateLesson($_GET["lesson"],  "finished_flg", $finished_flg);
+  $dbConnect = new dbConnect();
+  $dbConnect->initPDO();
+  $url = $dbConnect->getURL();
+
+  // レッスンを受けているユーザーとログインしているユーザーが一致した場合、レッスンのユーザー退出フラグを1にする
+  if ($student["id"] ==  $_SESSION["userData"]["id"]) {
+    $dbConnect->updateLesson($_GET["lesson"],  "leave_flg_student", LESSON["leave_flg_student"]);
+  } elseif ($teacher["id"] ==  $_SESSION["userData"]["id"]) {
+    $dbConnect->updateLesson($_GET["lesson"],  "leave_flg_teacher", LESSON["leave_flg_teacher"]);
+  }
 
   header('Location:' . $url . "rating?lesson=" . $_GET["lesson"]);
   exit;
 }
-
-
 ?>
 
 <html>
@@ -179,7 +182,7 @@ if ($_POST) {
 
       // HTMLに表示
       document.getElementById('countdown').innerText =
-        "残り時間: " + remainingHours + "時間 " + remainingMinutes + "分 " + remainingSeconds + "秒";
+        remainingHours + "時間 " + remainingMinutes + " : " + remainingSeconds;
 
       // カウントダウンが終了した場合
       if (remainingMillis <= 0) {

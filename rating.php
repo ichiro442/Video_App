@@ -12,45 +12,41 @@ if ($_GET["lesson"]) {
   $lesson = $dbConnect->findLessonByHash($_GET["lesson"]);
   $lesson = $lesson[0];
   $finished_flg_int = intval($lesson["finished_flg"]);
-
-  // レッスンが完了していない場合、前のページにリダイレクトする
-  // if ($finished_flg_int == 0) {
-  //   $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][7];
-  //   header("Location: {$_SERVER['HTTP_REFERER']}");
-  //   exit;
-  // }
   $student = $dbConnect->findByOneColumn("id", $lesson["student_id"], "Student");
   $teacher = $dbConnect->findByOneColumn("id", $lesson["teacher_id"], "Teacher");
+
+  // レッスンを完了していない場合、前のページにリダイレクトする
+  if (($student["id"] == $_SESSION["userData"]["id"] && $lesson["leave_flg_student"] !== LESSON["leave_flg_student"]) &&
+    ($teacher["id"] == $_SESSION["userData"]["id"] && $lesson["leave_flg_teacher"] !== LESSON["leave_flg_teacher"])
+  ) {
+    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][7];
+    header("Location: " . $url . "Student");
+    exit;
+  }
 }
+
+// 送信ボタンが押された場合
 if ($_POST) {
-  if ($student["id"] == $_SESSION["userData"]["id"]) {
+  if ($student["id"] == $_SESSION["userData"]["id"] && $lesson["leave_flg_student"] == 1) {
     // 生徒→講師の評価を登録する
     $rating_target = "teacher";
     $dbConnect->insertRating($lesson["id"], $student["id"], $teacher["id"], $rating_target, $_POST["rating"], $_POST["comment"]);
 
-    $finished_flg = LESSON["finished_flg"];
-    $dbConnect->updateLesson($_GET["lesson"], "finished_flg", $finished_flg);
-
-    // 生徒のそれぞれのindexの画面にリダイレクトする
-    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][8];
-    header('Location:' . $url . "Student");
+    // 生徒のindexの画面にリダイレクトする
+    // $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][8];
+    $_SESSION["flash_message"] = "評価が " . $_POST["rating"] . " / 5 で送信されました。";
+    header("Location: " . $url . "Student");
     exit;
-  } elseif ($teacher["id"] == $_SESSION["userData"]["id"]) {
+  } elseif ($teacher["id"] == $_SESSION["userData"]["id"] && $lesson["leave_flg_teacher"] == 1) {
     // 講師→生徒の評価を登録する
     $rating_target = "student";
     $dbConnect->insertRating($lesson["id"], $student["id"], $teacher["id"], $rating_target, $_POST["rating"], $_POST["comment"]);
-    $finished_flg = LESSON["finished_flg"];
-    $Connect->updateLesson($_GET["lesson"], "finished_flg", $finished_flg);
 
-    // 生徒のそれぞれのindexの画面にリダイレクトする
-    $_SESSION['flash_message'] = FLASH_MESSAGE["LESSON"][8];
+    // 講師のそれぞれのindexの画面にリダイレクトする
+    $_SESSION["flash_message"] = "評価が " . $_POST["rating"] . " / 5 で送信されました。";
     header('Location:' . $url . "Teacher");
     exit;
   }
-
-  $_SESSION["flash_message"] = "評価が " . $_POST["rating"] . " / 5 で送信されました。";
-  header("Location: " . $url . "Student");
-  exit;
 }
 
 $title = "レビュー";

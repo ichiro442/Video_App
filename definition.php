@@ -35,7 +35,6 @@ define('FLASH_MESSAGE', [
         5 => "このレッスンはすでに完了しています。",
         6 => "レッスン時刻より早い時刻は入室できません。",
         7 => "レッスンが完了していないと評価はできません。",
-        8 => "評価を完了しました。"
     ],
     "FILE" => [
         1 => "ファイルサイズは1MB未満にしてください。",
@@ -76,4 +75,6 @@ define('LESSON', [
     "cancel_time" => 8,
     "finished_flg" => 1,
     "finished_flg_cancel" => 2,
+    "leave_flg_student" => 1, // 退出ボタン押下
+    "leave_flg_teacher" => 1, // 退出ボタン押下
 ]);
