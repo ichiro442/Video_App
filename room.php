@@ -41,8 +41,8 @@ if ($_GET["lesson"]) {
   $teacher = $dbConnect->findByOneColumn("id", $lesson["teacher_id"], "Teacher");
 
   // 生徒と講師の名前
-  // $student = $student["nickname"];
-  // $teacher = $teacher["nickname"];
+  // $student_nickname = $student["nickname"];
+  // $teacher_nickname = $teacher["nickname"];
 
   // 25分を加算してend_timeを計算
   date_default_timezone_set('Asia/Tokyo');
@@ -80,8 +80,6 @@ if ($_POST) {
   <meta http-equiv="content-type" charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Bootstrapを利用する -->
-  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script> -->
   <link rel="stylesheet" href="Bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="style.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -170,6 +168,7 @@ if ($_POST) {
     function updateCountdown() {
       var now_jpn = moment();
       console.log("日本時間 " + now_jpn.format("YYYY-MM-DD HH:mm:ss"));
+
       var remainingMillis = end_time.diff(now_jpn); // ミリ秒単位の差を計算
 
       // ミリ秒を時間、分、秒に変換
@@ -186,8 +185,9 @@ if ($_POST) {
 
       // カウントダウンが終了した場合
       if (remainingMillis <= 0) {
-        document.getElementById('countdown').innerText = "カウントダウン終了";
+        // document.getElementById('countdown').innerText = "カウントダウン終了";
         clearInterval(intervalId);
+        submitForm();
       }
     }
     // 1秒ごとにカウントダウンを更新
@@ -197,11 +197,6 @@ if ($_POST) {
     updateCountdown();
 
     function submitForm() {
-      // ページ遷移時にカウントダウンの開始時間を削除する処理
-      // window.addEventListener('unload', function() {
-      //   localStorage.removeItem('startTime');
-      // });
-
       // フォームを取得
       var form = document.getElementById('hidden-form');
 
@@ -212,10 +207,8 @@ if ($_POST) {
   <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.js"></script>
   <script src="config.js"></script>
   <script src="main.js"></script>
-  <!-- <script src="countdown.js"></script> -->
   <script src="Bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
-<!-- <?php require_once('countdown2.php'); ?> -->
 <?php require_once('footer.php'); ?>
 
 </html>
