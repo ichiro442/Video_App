@@ -78,3 +78,21 @@ define('LESSON', [
     "leave_flg_student" => 1, // 退出ボタン押下
     "leave_flg_teacher" => 1, // 退出ボタン押下
 ]);
+// レディースドリンク
+define('DRINK', [
+    "A" => [
+        "name" => "レディースドリンク_A",
+        "price" => 1000,
+        "link" => "https://buy.stripe.com/test_3cscPz7K9dAy4PC4gg"
+    ],
+    "B" => [
+        "name" => "レディースドリンク_B",
+        "price" => 2000,
+        "link" => "https://buy.stripe.com/test_5kA3eZe8x9ki4PC145"
+    ],
+    "C" => [
+        "name" => "レディースドリンク_C",
+        "price" => 3000,
+        "link" => "https://buy.stripe.com/test_28obLvc0pgMK4PCeUW"
+    ],
+]);

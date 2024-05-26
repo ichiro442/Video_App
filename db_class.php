@@ -53,6 +53,11 @@ class dbConnect
             return $this->prodURL;
         }
     }
+    // 【共通】ストライプのシークレットキーを取得する
+    public function getStripeSecretKey()
+    {
+        return STRIPE_SECRET_KEY;
+    }
     // 【共通】写真をアップロードするする先のディレクトリの取得
     public function getdir()
     {
