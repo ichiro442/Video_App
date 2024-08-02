@@ -58,6 +58,13 @@ class dbConnect
     {
         return STRIPE_SECRET_KEY;
     }
+
+    // 【共通】ストライプのエンドポイントシークレットを取得する
+    public function getEndPointStripeSecretKey()
+    {
+        return ENDPOINT_SECRET;
+    }
+
     // 【共通】写真をアップロードするする先のディレクトリの取得
     public function getdir()
     {

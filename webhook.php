@@ -1,12 +1,13 @@
 <?php
 require 'vendor/autoload.php';
-$secret_key = $dbConnect->getStripeSecretKey();
-\Stripe\Stripe::setApiKey($secret_key);
+require_once('db_class.php');
 
-// ----------------下記はCHatGPTが書いたwebhook--------------
+$dbConnect = new dbConnect();
 
 // Webhookの署名検証のためのシークレットキー
-$endpoint_secret = 'your-webhook-signing-secret';
+$secret_key = $dbConnect->getStripeSecretKey();
+
+\Stripe\Stripe::setApiKey($secret_key);
 
 // Webhookのペイロードと署名を取得
 $payload = @file_get_contents('php://input');
@@ -34,7 +35,6 @@ try {
 // イベントタイプの処理
 if ($event['type'] == 'checkout.session.completed') {
     $session = $event['data']['object'];
-
     // 支払いが成功した場合の処理
     // 例：データベースに支払い情報を保存する
     // $session->id などの情報を使用して必要な処理を行う
