@@ -497,4 +497,26 @@ class dbConnect
         $stmt->bindvalue(":hash", $hash);
         return $stmt->execute();;
     }
+
+    // 【生徒】購入したドリンクを登録する
+    public function insertDrink($lesson_id, $drink_name, $session_id)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO drinks (lesson_id,drink_name,session_id) VALUE (:lesson_id,:drink_name,:session_id)");
+        $stmt->bindvalue(":lesson_id", $lesson_id);
+        $stmt->bindvalue(":drink_name", $drink_name);
+        $stmt->bindvalue(":session_id", $session_id);
+        return $stmt->execute();
+    }
+
+    // 【生徒】ドリンクがすでに購入されているか確認する
+    public function findDrinkBySessionID($session_id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM drinks WHERE session_id = :session_id");
+        $stmt->bindValue(':session_id', $session_id);
+        $stmt->execute();
+
+        // 検索結果を取得
+        $lessons = $stmt->fetchAll();
+        return empty($lessons);
+    }
 }

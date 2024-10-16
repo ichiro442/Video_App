@@ -57,15 +57,17 @@ if ($_GET["lesson"]) {
 }
 
 // レディースドリンクの購入
-if ($_POST[DRINK["A"]["name"]] || $_POST[DRINK["B"]["name"]] || $_POST[DRINK["C"]["name"]]) {
-
+if (isset($_POST[DRINK["A"]["name"]]) || isset($_POST[DRINK["B"]["name"]]) || isset($_POST[DRINK["C"]["name"]])) {
+  if ($_POST[DRINK["A"]["name"]]) $drink = "A";
+  elseif ($_POST[DRINK["B"]["name"]]) $drink = "B";
+  elseif ($_POST[DRINK["C"]["name"]]) $drink = "C";
   require 'vendor/autoload.php';
   $secret_key = $dbConnect->getStripeSecretKey();
   \Stripe\Stripe::setApiKey($secret_key);
   $checkout_session = \Stripe\Checkout\Session::create([
     "mode" => "payment",
-    "success_url" => $url . "room?lesson=" . $_GET["lesson"] . "&result=success",
-    "cancel_url"  => $url . "room?lesson=" . $_GET["lesson"] . "result=cancel", // 必要に応じてキャンセルURLも設定
+    "success_url" => $url . "room?lesson=" . $_GET["lesson"] . "&result=success&session_id={CHECKOUT_SESSION_ID}&d=$drink",
+    "cancel_url"  => $url . "room?lesson=" . $_GET["lesson"] . "&result=cancel", // 必要に応じてキャンセルURLも設定
     "line_items" => [
       [
         "quantity" => 1,
@@ -81,6 +83,28 @@ if ($_POST[DRINK["A"]["name"]] || $_POST[DRINK["B"]["name"]] || $_POST[DRINK["C"
   ]);
   http_response_code(303);
   header("Location: " . $checkout_session->url);
+}
+
+if (isset($_GET["session_id"])) {
+  require 'vendor/autoload.php';
+  \Stripe\Stripe::setApiKey($dbConnect->getStripeSecretKey());
+  $checkout_session = \Stripe\Checkout\Session::retrieve($_GET["session_id"]);
+  if ($checkout_session["payment_status"] == "paid") {
+    $dbConnect = new dbConnect();
+    $dbConnect->initPDO();
+
+    $lesson_id = 0;
+    if ($_GET["lesson"]) {
+      $lesson = $dbConnect->findLessonByHash($_GET["lesson"]);
+      $lesson_id = $lesson[0][0];
+    }
+
+    if ($dbConnect->findDrinkBySessionID($_GET["session_id"])) {
+      // ドリンクの金額も保存する？金額は要らないか。定数を定義していたら計算するときにそこから金額を引っ張ってくるだけでいい
+
+      $dbConnect->insertDrink($lesson_id, DRINK[$_GET["d"]]["name"], $_GET["session_id"]);
+    }
+  }
 }
 
 // レッスンが完了した場合
@@ -140,6 +164,36 @@ if ($_POST["lesson"]) {
   /* .buy-link a {
     color: white;
   } */
+
+  /* トーストの基本スタイル */
+  .toast {
+    visibility: hidden;
+    /* 初期状態は非表示 */
+    min-width: 250px;
+    margin: 0 auto;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    top: 10px;
+    /* 画面上部に配置 */
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 17px;
+    opacity: 0;
+    transition: opacity 0.5s, visibility 0.5s;
+  }
+
+  /* トースト表示時のスタイル */
+  .toast.show {
+    visibility: visible;
+    opacity: 1;
+    /* フェードイン */
+  }
 </style>
 <?php require_once('modal_message.php'); ?>
 
@@ -152,6 +206,9 @@ if ($_POST["lesson"]) {
       </div>
     </div>
   </div>
+
+  <!-- トースト通知 -->
+  <div id="toast" class="toast"></div>
 
   <!-- カウントダウン -->
   <div id="countdown" class="countdown"></div>
@@ -202,6 +259,37 @@ if ($_POST["lesson"]) {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
 
   <script>
+    function showToast(msg) {
+      var toast = document.getElementById("toast");
+      toast.innerHTML = msg;
+      toast.classList.add("show");
+
+      // 3秒後にトーストを自動で非表示にする
+      setTimeout(function() {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    window.onload = function() {
+      // 現在のURLのクエリ文字列を取得
+      const queryString = window.location.search;
+
+      // URLSearchParamsオブジェクトを使ってクエリパラメータを解析
+      const urlParams = new URLSearchParams(queryString);
+
+      // resultパラメータの値を取得
+      const result = urlParams.get('result');
+
+      // resultが存在するかチェックし、値を表示
+      if (result) {
+        if (result === 'success') {
+          showToast('成功しました！');
+        } else if (result === 'cancel') {
+          showToast('失敗しました。');
+        }
+      }
+    };
+
     // PHPから取得した文字列をJavaScriptで日本時間に変換
     const end_time_str = "<?php echo $end_time; ?>";
 
